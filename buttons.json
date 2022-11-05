@@ -1,0 +1,75 @@
+[
+    {
+        "name": "Полезное",
+        "type": "grid3",
+        "items": [
+            {
+                "icon": {"src": "https://cdn.profcomff.com/app/menu_icons/printer.svg"},
+                "text": "Бесплатный принтер",
+                "path": "https://printer.ui.profcomff.com"
+            },
+            {
+                "icon": {"src": "https://cdn.profcomff.com/app/menu_icons/fifth_floor.svg"},
+                "text": "Схема этажей",
+                "path": "https://cdn.profcomff.com/app/map/"
+            }
+        ]
+    },
+    {
+        "name": "Сервисы",
+        "type": "grid3",
+        "items": [
+            {
+                "icon": {"src": "https://cdn.profcomff.com/app/menu_icons/write_us.svg"},
+                "text": "Написать в профком",
+                "path": "https://vk.me/profcomff"
+            },
+            {
+                "icon": {"src": "https://cdn.profcomff.com/app/menu_icons/study_office.svg"},
+                "text": "Учебная часть",
+                "path": "https://phys.msu.ru/rus/students/obshaja_infa.php#:~:text=%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D1%83%D1%87%D0%B5%D0%B1%D0%BD%D0%BE%D0%B3%D0%BE%20%D0%BE%D1%82%D0%B4%D0%B5%D0%BB%D0%B0"
+            },
+            {
+                "icon": {"src": "https://cdn.profcomff.com/app/menu_icons/courses.svg"},
+                "text": "МФК",
+                "path": "https://lk.msu.ru/course"
+            },
+            {
+                "icon": {"src": "https://cdn.profcomff.com/app/menu_icons/report.svg"},
+                "text": "Жалоба",
+                "path": "https://vk.com/app5619682_-24234717"
+            },
+            {
+                "icon": {"src": "https://cdn.profcomff.com/app/menu_icons/money_help.svg"},
+                "text": "Материальная помощь",
+                "path": "https://vk.com/profcomff?w=page-24234717_51953473"
+            },
+            {
+                "icon": {"src": "https://cdn.profcomff.com/app/menu_icons/join.svg"},
+                "text": "Вступить в профсоюз",
+                "path": "https://lk.msuprof.com/"
+            }
+        ]
+    },
+    {
+        "name": "Информация",
+        "type": "list",
+        "items": [
+            {
+                "icon": {"src": "install_mobile"},
+                "text": "Установить приложение",
+                "path": "https://pages.profcomff.com/installation"
+            },
+            {
+                "icon": {"src": "feedback"},
+                "text": "Обратная связь",
+                "path": "https://forms.yandex.ru/u/630f979143537dde00621b0b/"
+            },
+            {
+                "icon": {"src": "info"},
+                "text": "О приложении",
+                "path": "https://pages.profcomff.com/about"
+            }
+        ]
+    }
+]
