@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, PickleType
+from sqlalchemy import Column, Integer, String, ForeignKey
 from models.database import Base
 
 
@@ -7,8 +7,10 @@ class Button(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    category_id = Column(Integer, ForeignKey('category.id'))
+    category_id = Column(Integer, ForeignKey("category.category_id"))
     icon = Column(String)
+
+    # category = relationship("Category", back_populates="category")
 
     def __init__(self, id: int, name: str, category_id: int, icon: dict):
         self.id = id
