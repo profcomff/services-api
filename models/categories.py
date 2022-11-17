@@ -10,7 +10,6 @@ class Category(Base):
     category_id = Column('category_id', Integer, unique=True)
     name = Column('name', String)
     type = Column('type', String)
-
     # category = relationship("Button", back_populates="category")
 
     def __repr__(self):

@@ -1,7 +1,6 @@
 # This Python file uses the following encoding: utf-8
 
 from faker import Faker
-
 from models.database import create_db, Session, get_db
 from models.buttons import Button
 from models.categories import Category

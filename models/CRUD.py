@@ -31,7 +31,7 @@ class ButtonBase(BaseModel):
 
 class ButtonCreate(ButtonBase):
     name: str
-    icon: str
+    icon: dict
 
 
 class ButtonDelete(ButtonBase):

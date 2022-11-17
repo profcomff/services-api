@@ -21,7 +21,7 @@ def get_categories(db: Session, skip: int, limit: int):
 
 def create_button(db: Session, button: CRUD.ButtonCreate):
     db_button = buttons.Button(id=button.id, category_id=button.category_id,
-                               name=button.name, icon={"src": button.icon})
+                               name=button.name, icon=button.icon["src"])
     try:
         db.add(db_button)
         db.commit()
@@ -54,62 +54,39 @@ def delete_button(db: Session, button_id: int):
 
 def delete_category(db: Session, category_id: int):
     delete = db.query(categories.Category).filter(categories.Category.id == category_id).first()
-    try:
-        db.delete(delete)
+    d = db.query(buttons.Button).filter(buttons.Button.category_id == category_id).all()
+    for button in d:
+        db.delete(button)
         db.commit()
-    except:
-        raise ValueError('Object doesn`t exist')
+    db.delete(delete)
+    db.commit()
     db.close()
 
 
-def update_button(db: Session, button_id: int, object: str, value: str):
-    button = db.query(buttons.Button).filter(buttons.Button.id == button_id).first()
-    if not button:
-        raise ValueError('Object doesn`t exist')
-    category_id = button.category_id
-    if object == 'category':
-        value = int(value)
-        delete_button(db=Session(bind=engine), button_id=button_id)
-        create_button(db=Session(bind=engine), button=CRUD.ButtonCreate(
-                      id=button_id, category_id=value, name=button.name, icon=button.icon))
-    elif object == 'name':
-        icon = button.icon
-        delete_button(db=Session(bind=engine), button_id=button_id)
-        create_button(db=Session(bind=engine), button=CRUD.ButtonCreate(
-            id=button_id, category_id=category_id, name=value, icon=icon))
-
-    elif object == 'icon':
-        name = button.name
-        delete_button(db=Session(bind=engine), button_id=button_id)
-        create_button(db=Session(bind=engine), button=CRUD.ButtonCreate(
-                            id=button_id, category_id=category_id, name=name, icon=value))
-    else:
-        raise ValueError('Invalid object')
+def update_button(db: Session, button_id: int, button: CRUD.ButtonCreate):
+    old_button = db.query(buttons.Button).filter(buttons.Button.id == button_id).first()
+    new_button = buttons.Button(id=button.id, category_id=button.category_id,
+                                name=button.name, icon=button.icon)
+    delete_button(db=db, button_id=old_button.id)
+    create_button(db=db, button=new_button)
 
 
-# ТЕСТЫ CRUD РУЧЕК (вроде работает)
+def update_category(db: Session, category_id: int, category: CRUD.CategoryCreate):
+    old_category = db.query(buttons.Button).filter(buttons.Button.id == category_id).first()
+    new_category = categories.Category(id=category.id, category_id=category.category_id,
+                                       name=category.name, type=category.type)
+    delete_category(db=db, category_id=old_category.id)
+    create_category(db=db, category=new_category)
 
-# print(get_button(db=Session(bind=engine), button_id=7))
-# print(get_category(db=Session(bind=engine), category_id=2))
-#
-# create_category(db=Session(bind=engine),
-#                 category=CRUD.CategoryCreate(
-#                     id=4, category_id=4, type='test', name='test'))
-#
-# print(get_category(db=Session(bind=engine), category_id=4))
-# print(get_buttons(db=Session(bind=engine), skip=0, limit=100))
-# print(get_categories(db=Session(bind=engine), skip=0, limit=100))
 
 # create_button(db=Session(bind=engine), button=CRUD.ButtonCreate(
-#     id=15, category_id=4, name='test', icon='test'))
+#     id=15, category_id=4, name='test', icon={"src": 'test'}))
+# print(get_button(db=Session(bind=engine), button_id=15))
+# update_button(db=Session(bind=engine), button_id=15, button=CRUD.ButtonCreate(
+#     id=15, category_id=4, name='test', icon={"src": 'lmao'}))
 # print(get_button(db=Session(bind=engine), button_id=15))
 
-# delete_button(db=Session(bind=engine), button_id=15)
-# print(get_button(db=Session(bind=engine), button_id=15))
-
-# delete_category(db=Session(bind=engine), category_id=4)
 # print(get_category(db=Session(bind=engine), category_id=4))
-# create_button(db=Session(bind=engine), button=CRUD.ButtonCreate(
-#               id=15, category_id=3, name='test', icon='test'))
-# update_button(db=Session(bind=engine), button_id=15, object='category', value='3')
-# print(get_button(db=Session(bind=engine), button_id=15))
+# update_category(db=Session(bind=engine), category_id=4, category=CRUD.CategoryCreate(
+#     id=4, category_id=4, name='быбик', type='насрали'))
+# print(get_category(db=Session(bind=engine), category_id=4))

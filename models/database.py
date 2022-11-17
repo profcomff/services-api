@@ -1,13 +1,13 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-import psycopg2
+from dotenv import load_dotenv
+import os
 
-DATABASE_NAME = 'buttons.sqlite'
-engine = create_engine(f'postgresql://postgres:123@localhost:5432/Profcom')
-# engine = create_engine(f'sqlite:///{DATABASE_NAME}')
+load_dotenv()
+path = os.getenv('SQL_DATABASE_PATH')
+engine = create_engine(path)
 Session = sessionmaker(bind=engine)
-
 Base = declarative_base()
 
 
