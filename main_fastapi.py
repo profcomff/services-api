@@ -37,7 +37,7 @@ def get_button(button_id: int, db: Session = Depends(get_db)):
     return db_button
 
 
-@app.post("/buttons/{button_id}")
+@app.delete("/buttons/")
 def remove_button(button_id: int, db: Session = Depends(get_db)):
     db_button = methods.get_button(db, button_id)
     if db_button is None:
@@ -45,7 +45,7 @@ def remove_button(button_id: int, db: Session = Depends(get_db)):
     return methods.delete_button(db=db, button_id=button_id)
 
 
-@app.post("/buttons/{button_id}/update")
+@app.patch("/buttons/")
 def update_button(button: CRUD.ButtonCreate, db: Session = Depends(get_db)):
     db_old_button = get_button(button_id=button.id, db=db)
     if db_old_button is None:
@@ -74,7 +74,7 @@ def get_category(category_id: int, db: Session = Depends(get_db)):
     return db_category
 
 
-@app.post("/categories/{category_id}")
+@app.delete("/categories/")
 def remove_category(category_id: int, db: Session = Depends(get_db)):
     db_category = methods.get_category(db, category_id=category_id)
     if db_category is None:
@@ -82,7 +82,7 @@ def remove_category(category_id: int, db: Session = Depends(get_db)):
     return methods.delete_category(db=db, category_id=category_id)
 
 
-@app.post("/categories/{category_id}/update")
+@app.patch("/categories/")
 def update_category(category: CRUD.CategoryCreate, db: Session = Depends(get_db)):
     db_old_category = methods.get_category(db=db, category_id=category.id)
     if db_old_category is None:
