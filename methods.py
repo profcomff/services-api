@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
 from models import CRUD, buttons, categories
-from models.database import engine
 
 
 def get_button(db: Session, button_id: int):
@@ -19,20 +18,18 @@ def get_categories(db: Session, skip: int, limit: int):
     return db.query(categories.Category).offset(skip).limit(limit).all()
 
 
-def create_button(db: Session, button: CRUD.ButtonCreate):
+def create_button(db: Session, button: CRUD.Button):
     db_button = buttons.Button(id=button.id, category_id=button.category_id,
-                               name=button.name, icon=button.icon["src"])
-    try:
-        db.add(db_button)
-        db.commit()
-        db.refresh(db_button)
-        return db_button
-    except:
-        print('Кнопка уже существует или неверно указан параметр категории')
+                               name=button.name, icon=button.icon)
+    db.add(db_button)
+    db.commit()
+    db.refresh(db_button)
     db.close()
 
+    return db_button
 
-def create_category(db: Session, category: CRUD.CategoryCreate):
+
+def create_category(db: Session, category: CRUD.Category):
     db_category = categories.Category(id=category.id, category_id=category.category_id,
                                       type=category.type, name=category.name)
     db.add(db_category)
@@ -44,12 +41,10 @@ def create_category(db: Session, category: CRUD.CategoryCreate):
 
 def delete_button(db: Session, button_id: int):
     delete = db.query(buttons.Button).filter(buttons.Button.id == button_id).first()
-    try:
-        db.delete(delete)
-        db.commit()
-    except:
-        raise ValueError('Object doesn`t exist')
+    db.delete(delete)
+    db.commit()
     db.close()
+    return delete
 
 
 def delete_category(db: Session, category_id: int):
@@ -62,31 +57,24 @@ def delete_category(db: Session, category_id: int):
     db.commit()
     db.close()
 
+    return delete
 
-def update_button(db: Session, button_id: int, button: CRUD.ButtonCreate):
+
+def update_button(db: Session, button_id: int, button: CRUD.Button):
     old_button = db.query(buttons.Button).filter(buttons.Button.id == button_id).first()
     new_button = buttons.Button(id=button.id, category_id=button.category_id,
                                 name=button.name, icon=button.icon)
     delete_button(db=db, button_id=old_button.id)
     create_button(db=db, button=new_button)
 
+    return new_button
 
-def update_category(db: Session, category_id: int, category: CRUD.CategoryCreate):
+
+def update_category(db: Session, category_id: int, category: CRUD.Category):
     old_category = db.query(buttons.Button).filter(buttons.Button.id == category_id).first()
     new_category = categories.Category(id=category.id, category_id=category.category_id,
                                        name=category.name, type=category.type)
     delete_category(db=db, category_id=old_category.id)
     create_category(db=db, category=new_category)
 
-
-# create_button(db=Session(bind=engine), button=CRUD.ButtonCreate(
-#     id=15, category_id=4, name='test', icon={"src": 'test'}))
-# print(get_button(db=Session(bind=engine), button_id=15))
-# update_button(db=Session(bind=engine), button_id=15, button=CRUD.ButtonCreate(
-#     id=15, category_id=4, name='test', icon={"src": 'lmao'}))
-# print(get_button(db=Session(bind=engine), button_id=15))
-
-# print(get_category(db=Session(bind=engine), category_id=4))
-# update_category(db=Session(bind=engine), category_id=4, category=CRUD.CategoryCreate(
-#     id=4, category_id=4, name='быбик', type='насрали'))
-# print(get_category(db=Session(bind=engine), category_id=4))
+    return new_category

@@ -1,9 +1,9 @@
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
-from models.database import Base
+from sqlalchemy.ext.declarative import declarative_base
 
 
-class Category(Base):
+class Category(declarative_base()):
     __tablename__ = 'category'
 
     id = Column('id', Integer, primary_key=True)
@@ -16,5 +16,3 @@ class Category(Base):
         return f'Категория {self.name}. Тип: {self.type}\n' \
                f'ID: {self.category_id}'
 
-    def give_id(self):  # Небольшой костыль :)
-        return self.category_id

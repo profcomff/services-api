@@ -1,47 +1,22 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
-class CategoryBase(BaseModel):
+class Category(BaseModel):
     id: int
     category_id: int
-
-
-class CategoryCreate(CategoryBase):
-    type: str
-    name: str
-
-
-class CategoryDelete(CategoryBase):
-    type: str
-    name: str
-
-
-class Category(CategoryBase):
-    type: str
-    name: str
+    type: Optional[str]
+    name: Optional[str]
 
     class Config:
         orm_mode = True
 
 
-class ButtonBase(BaseModel):
+class Button(BaseModel):
     id: int
     category_id: int
-
-
-class ButtonCreate(ButtonBase):
-    name: str
-    icon: dict
-
-
-class ButtonDelete(ButtonBase):
-    name: str
-    icon: str
-
-
-class Button(ButtonBase):
-    name: str
-    icon: str
+    name: Optional[str]
+    icon: Optional[str]
 
     class Config:
         orm_mode = True
