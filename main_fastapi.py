@@ -10,12 +10,12 @@ from models import CRUD
 def create_button(button: CRUD.Button, db: Session = Depends(get_db)):
     db_button = methods.get_button(db, button_id=button.id)
     if db_button:
-        raise HTTPException(status_code=400, detail='Button already exist')
+        raise HTTPException(status_code=409, detail='Button already exist')
     return methods.create_button(db=db, button=button)
 
 
 @app.get("/button/", response_model=list[CRUD.Button])
-def get_buttons(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def get_buttons(skip: int, limit: int, db: Session = Depends(get_db)):
     return methods.get_buttons(db, skip=skip, limit=limit)
 
 
@@ -47,7 +47,7 @@ def update_button(button: CRUD.Button, db: Session = Depends(get_db)):
 def create_category(category: CRUD.Category, db: Session = Depends(get_db)):
     db_category = methods.get_category(category_id=category.id, db=db)
     if db_category:
-        raise HTTPException(status_code=400, detail="Category already exist")
+        raise HTTPException(status_code=409, detail="Category already exist")
     return methods.create_category(db=db, category=category)
 
 
