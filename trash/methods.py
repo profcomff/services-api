@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import CRUD, buttons, categories
+from trash.models import buttons, categories, CRUD
 
 
 def get_button(db: Session, button_id: int):
@@ -61,13 +61,14 @@ def delete_category(db: Session, category_id: int):
 
 
 def update_button(db: Session, button_id: int, button: CRUD.Button):
-    old_button = db.query(buttons.Button).filter(buttons.Button.id == button_id).first()
-    new_button = buttons.Button(id=button.id, category_id=button.category_id,
-                                name=button.name, icon=button.icon)
-    delete_button(db=db, button_id=old_button.id)
-    create_button(db=db, button=new_button)
+    # old_button = db.query(buttons.Button).filter(buttons.Button.id == button_id).first()
+    # new_button = buttons.Button(id=button.id, category_id=button.category_id,
+    #                             name=button.name, icon=button.icon)
+    # delete_button(db=db, button_id=old_button.id)
+    # create_button(db=db, button=new_button)
+    db.query(buttons.Button).update(button)
 
-    return new_button
+    return button
 
 
 def update_category(db: Session, category_id: int, category: CRUD.Category):
