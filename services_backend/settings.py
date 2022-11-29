@@ -1,10 +1,12 @@
+import os
+
 from pydantic import BaseSettings, PostgresDsn
 from functools import lru_cache
 
 
 class Settings(BaseSettings):
     """Application settings"""
-    DB_DSN: PostgresDsn = f'postgresql://postgres:123@localhost:5432/Profcom'
+    DB_DSN: PostgresDsn = os.getenv(".env")
 
     CORS_ALLOW_ORIGINS: list[str] = ['*']
     CORS_ALLOW_CREDENTIALS: bool = True

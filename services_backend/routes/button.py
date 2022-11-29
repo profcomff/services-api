@@ -1,5 +1,7 @@
 from fastapi import HTTPException, APIRouter, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy.engine import create_engine
+from sqlalchemy.ext.declarative import declarative_base
 
 from .models.button import ButtonCreate, ButtonUpdate, ButtonGet
 from ..models.database import Button
@@ -10,10 +12,14 @@ button = APIRouter(
     responses={404: {"description": "You tried, but no"}}
 )
 
+Base = declarative_base()
+engine = create_engine('postgresql+psycopg2://postgres:123@localhost:5432/Profcom')
+Base.metadata.create_all(bind=engine)
+
 
 # Да, без этого говна ничего не работает, я честно пытался
 def get_db():
-    db = Session()
+    db = Session(bind=engine)
     try:
         yield db
     finally:

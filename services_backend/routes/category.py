@@ -1,5 +1,7 @@
 from fastapi import HTTPException, APIRouter, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy.engine import create_engine
+from sqlalchemy.ext.declarative import declarative_base
 
 from .models.category import CategoryCreate, CategoryUpdate, CategoryGet
 from ..models.database import Category, Button
@@ -10,10 +12,14 @@ category = APIRouter(
     responses={404: {"description": "You tried, but no"}}
 )
 
+Base = declarative_base()
+engine = create_engine('postgresql+psycopg2://postgres:123@localhost:5432/Profcom')
+Base.metadata.create_all(bind=engine)
+
 
 # Да, без этого говна ничего не работает, я честно пытался
 def get_db():
-    db = Session()
+    db = Session(bind=engine)
     try:
         yield db
     finally:
@@ -33,7 +39,7 @@ def create_category(category: CategoryCreate, db: Session = Depends(get_db)):
 
 
 @category.get("/", response_model=list[CategoryGet])
-def get_categories(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
+def get_categories(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), ):
     return db.query(Category).offset(skip).limit(limit).all()
 
 

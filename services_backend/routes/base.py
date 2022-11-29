@@ -9,8 +9,8 @@ from fastapi_sqlalchemy import DBSessionMiddleware
 # Насрано вот тут
 settings = Settings()
 app = FastAPI(debug=True)
-app.mount("/button", button)
-app.mount("/category", category)
+app.include_router(button)
+app.include_router(category)
 
 
 app.add_middleware(
