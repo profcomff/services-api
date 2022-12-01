@@ -1,7 +1,5 @@
-from fastapi import HTTPException, APIRouter, Depends
-from sqlalchemy.orm import Session
-from sqlalchemy.engine import create_engine
-from sqlalchemy.ext.declarative import declarative_base
+from fastapi import HTTPException, APIRouter
+from fastapi_sqlalchemy import db
 
 from .models.category import CategoryCreate, CategoryUpdate, CategoryGet
 from ..models.database import Category, Button
@@ -11,63 +9,44 @@ category = APIRouter(
     responses={404: {"description": "You tried, but no"}}
 )
 
-Base = declarative_base()
-engine = create_engine('postgresql+psycopg2://postgres:123@localhost:5432/Profcom')
-Base.metadata.create_all(bind=engine)
-
-
-# Да, без этого говна ничего не работает, я честно пытался
-def get_db():
-    db = Session(bind=engine)
-    try:
-        yield db
-    finally:
-        db.close()
-
 
 @category.post("/", response_model=CategoryCreate)
-def create_category(category: CategoryCreate, db: Session = Depends(get_db)):
+def create_category(category: CategoryCreate):
     db_category = CategoryCreate(category_id=category.category_id,
                                  type=category.type, name=category.name)
-    db.add(db_category)
-    db.commit()
-    db.refresh(db_category)
-    db.close()
-
+    db.session.add(db_category)
     return db_category
 
 
 @category.get("/", response_model=list[CategoryGet])
-def get_categories(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return db.query(Category).offset(skip).limit(limit).all()
+def get_categories(skip: int = 0, limit: int = 100):
+    return db.session.query(Category).offset(skip).limit(limit).all()
 
 
 @category.get("/{category_id}", response_model=CategoryGet)
-def get_category(category_id: int, db: Session = Depends(get_db)):
-    db_category = db.query(Category).filter(Category.id == category_id).first()
+def get_category(category_id: int):
+    db_category = db.session.query(Category).filter(Category.id == category_id).first()
     if db_category is None:
         raise HTTPException(status_code=404, detail="Category does not exist")
     return db_category
 
 
 @category.delete("/")
-def remove_category(category_id: int, db: Session = Depends(get_db)):
+def remove_category(category_id: int):
     db_category = get_category(db=db, category_id=category_id)
     if db_category is None:
         raise HTTPException(status_code=404, detail="Category does not exist")
-    delete = db.query(Category).filter(Category.id == category_id).first()
-    d = db.query(Button).filter(Button.category_id == category_id).all()
+    delete = db.session.query(Category).filter(Category.id == category_id).first()
+    d = db.session.query(Button).filter(Button.category_id == category_id).all()
     for button in d:
-        db.delete(button)
-        db.commit()
-    db.delete(delete)
-    db.commit()
-    db.close()
+        db.session.delete(button)
+        db.session.flush()
+    db.session.delete(delete)
 
 
 @category.patch("/", response_model=CategoryUpdate)
-def update_category(category: CategoryUpdate, db: Session = Depends(get_db)):
+def update_category(category: CategoryUpdate):
     db_old_category = get_category(db=db, category_id=category.id)
     if db_old_category is None:
         raise HTTPException(status_code=404, detail="Category does not exist")
-    return db.query(Category).update(category)
+    return db.session.query(Category).update(category)
