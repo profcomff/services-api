@@ -10,7 +10,7 @@ services:
 
  api:
    build: .
-   env_file: env.env
+   env_file: .env.
    command: bash -c "alembic upgrade head && uvicorn services_backend.__main__:app --reload"
    volumes:
      - .:/app

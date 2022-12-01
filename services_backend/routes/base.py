@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from ..settings import Settings
+from services_backend.settings import Settings
 from .button import button
 from .category import category
 from fastapi.middleware.cors import CORSMiddleware

@@ -6,14 +6,13 @@ from ..models.database import Category, Button
 
 category = APIRouter(
     tags=["category"],
-    responses={404: {"description": "You tried, but no"}}
+    responses={200: {"description": "Ok"}}
 )
 
 
 @category.post("/", response_model=CategoryCreate)
 def create_category(category: CategoryCreate):
-    db_category = CategoryCreate(category_id=category.category_id,
-                                 type=category.type, name=category.name)
+    db_category = Category(type=category.type, name=category.name)
     db.session.add(db_category)
     return db_category
 
@@ -33,7 +32,7 @@ def get_category(category_id: int):
 
 @category.delete("/")
 def remove_category(category_id: int):
-    db_category = get_category(db=db, category_id=category_id)
+    db_category = get_category(category_id=category_id)
     if db_category is None:
         raise HTTPException(status_code=404, detail="Category does not exist")
     delete = db.session.query(Category).filter(Category.id == category_id).first()
