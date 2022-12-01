@@ -7,7 +7,6 @@ from .models.category import CategoryCreate, CategoryUpdate, CategoryGet
 from ..models.database import Category, Button
 
 category = APIRouter(
-    prefix="/category",
     tags=["category"],
     responses={404: {"description": "You tried, but no"}}
 )
@@ -39,7 +38,7 @@ def create_category(category: CategoryCreate, db: Session = Depends(get_db)):
 
 
 @category.get("/", response_model=list[CategoryGet])
-def get_categories(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), ):
+def get_categories(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return db.query(Category).offset(skip).limit(limit).all()
 
 

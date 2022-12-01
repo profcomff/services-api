@@ -7,7 +7,6 @@ from .models.button import ButtonCreate, ButtonUpdate, ButtonGet
 from ..models.database import Button
 
 button = APIRouter(
-    prefix="/button",
     tags=["button"],
     responses={404: {"description": "You tried, but no"}}
 )
@@ -39,7 +38,7 @@ def create_button(button: ButtonCreate, db: Session = Depends(get_db)):
 
 
 @button.get("/", response_model=list[ButtonGet])
-def get_buttons(skip: int, limit: int, db: Session = Depends(get_db)):
+def get_buttons(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return db.query(Button).offset(skip).limit(limit).all()
 
 

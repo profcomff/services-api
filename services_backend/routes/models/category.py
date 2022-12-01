@@ -17,4 +17,7 @@ class CategoryUpdate(Base):
 
 class CategoryGet(Base):
     id: int
+    category_id: Optional[int]
+    type: Optional[str]
+    name: Optional[str]
 
