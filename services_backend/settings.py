@@ -8,9 +8,7 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     """Application settings"""
-    path = os.path.join(os.path.dirname(__file__), 'env.env')
-    load_dotenv(path)
-    DB_DSN: PostgresDsn = os.getenv('DATABASE_URL')
+    DB_DSN: PostgresDsn = 'postgresql://postgres@localhost:5432/postgres'
 
     CORS_ALLOW_ORIGINS: list[str] = ['*']
     CORS_ALLOW_CREDENTIALS: bool = True
@@ -21,7 +19,7 @@ class Settings(BaseSettings):
         """Pydantic BaseSettings config"""
 
         case_sensitive = True
-        env_file = "env.env"
+        env_file = ".env"
 
 
 @lru_cache
