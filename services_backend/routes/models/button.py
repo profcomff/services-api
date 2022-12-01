@@ -15,5 +15,8 @@ class ButtonUpdate(Base):
     name: Optional[str]
 
 
-class ButtonGet(Base):
+class ButtonGet(Base):  
     id: int
+    category_id: int
+    icon: Optional[str]
+    name: Optional[str]

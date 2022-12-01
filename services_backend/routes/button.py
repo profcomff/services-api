@@ -16,9 +16,10 @@ def create_button(button: ButtonCreate):
     db_category = get_category(category_id=button.category_id)
     if db_category is None:
         raise HTTPException(status_code=404, detail="Category does not exist")
-    db_button = ButtonCreate(category_id=button.category_id, name=button.name,
+    db_button = Button(category_id=button.category_id, name=button.name,
                              icon=button.icon)
     db.session.add(db_button)
+    db.session.flush()
     return db_button
 
 

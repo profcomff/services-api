@@ -14,6 +14,7 @@ category = APIRouter(
 def create_category(category: CategoryCreate):
     db_category = Category(type=category.type, name=category.name)
     db.session.add(db_category)
+    db.session.flush()
     return db_category
 
 
@@ -41,11 +42,12 @@ def remove_category(category_id: int):
         db.session.delete(button)
         db.session.flush()
     db.session.delete(delete)
+    db.session.flush()
 
 
 @category.patch("/", response_model=CategoryUpdate)
 def update_category(category: CategoryUpdate):
-    db_old_category = get_category(db=db, category_id=category.id)
+    db_old_category = get_category(category_id=category.id)
     if db_old_category is None:
         raise HTTPException(status_code=404, detail="Category does not exist")
     return db.session.query(Category).update(category)

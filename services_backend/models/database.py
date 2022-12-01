@@ -5,7 +5,6 @@ from .base import Base
 
 class Category(Base):
     id = Column(Integer, primary_key=True)
-    # category_id = Column(Integer, unique=True)
     name = Column(String)
     type = Column(String)
     category = relationship("Button", back_populates="category")
