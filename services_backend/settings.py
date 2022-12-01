@@ -1,14 +1,10 @@
-import os
-from pathlib import Path
-
-from dotenv import load_dotenv
 from pydantic import BaseSettings, PostgresDsn
 from functools import lru_cache
 
 
 class Settings(BaseSettings):
     """Application settings"""
-    DB_DSN: PostgresDsn = 'postgresql://postgres@localhost:5432/postgres'
+    DB_DSN: PostgresDsn = 'postgresql://postgres:123@localhost:5432/postgres'
 
     CORS_ALLOW_ORIGINS: list[str] = ['*']
     CORS_ALLOW_CREDENTIALS: bool = True
@@ -19,7 +15,7 @@ class Settings(BaseSettings):
         """Pydantic BaseSettings config"""
 
         case_sensitive = True
-        env_file = ".env"
+        env_file = "env.env"
 
 
 @lru_cache

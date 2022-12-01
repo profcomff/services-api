@@ -6,7 +6,6 @@ from .category import category
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_sqlalchemy import DBSessionMiddleware
 
-
 settings = Settings()
 app = FastAPI(debug=True)
 
@@ -24,6 +23,7 @@ app.add_middleware(
     allow_methods=settings.CORS_ALLOW_METHODS,
     allow_headers=settings.CORS_ALLOW_HEADERS,
 )
+
 
 app.include_router(button, prefix='/button')
 app.include_router(category, prefix='/category')
