@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_sqlalchemy import DBSessionMiddleware
 
 settings = Settings()
-app = FastAPI(debug=True)
+app = FastAPI()
 
 
 app.add_middleware(

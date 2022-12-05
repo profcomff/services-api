@@ -8,7 +8,6 @@ class CategoryCreate(Base):
 
 
 class CategoryUpdate(Base):
-    id: int
     type: Optional[str]
     name: Optional[str]
 

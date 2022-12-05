@@ -7,12 +7,12 @@ class Category(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     type = Column(String)
-    category = relationship("Button", back_populates="category")
+    button = relationship("Button", back_populates="category")
 
 
 class Button(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     category_id = Column(Integer, ForeignKey(Category.id))
-    category = relationship("Category", back_populates="category")
+    category = relationship("Category", back_populates="button")
     icon = Column(String)

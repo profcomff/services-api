@@ -25,7 +25,7 @@ def get_categories(skip: int = 0, limit: int = 100):
 
 @category.get("/{category_id}", response_model=CategoryGet)
 def get_category(category_id: int):
-    db_category = db.session.query(Category).filter(Category.id == category_id).first()
+    db_category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if db_category is None:
         raise HTTPException(status_code=404, detail="Category does not exist")
     return db_category
@@ -36,7 +36,7 @@ def remove_category(category_id: int):
     db_category = get_category(category_id=category_id)
     if db_category is None:
         raise HTTPException(status_code=404, detail="Category does not exist")
-    delete = db.session.query(Category).filter(Category.id == category_id).first()
+    delete = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     d = db.session.query(Button).filter(Button.category_id == category_id).all()
     for button in d:
         db.session.delete(button)
@@ -45,9 +45,14 @@ def remove_category(category_id: int):
     db.session.flush()
 
 
-@category.patch("/", response_model=CategoryUpdate)
-def update_category(category: CategoryUpdate):
-    db_old_category = get_category(category_id=category.id)
+@category.patch("/{category_id}", response_model=CategoryUpdate)
+def update_category(category: CategoryUpdate, category_id: int):
+    db_old_category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if db_old_category is None:
         raise HTTPException(status_code=404, detail="Category does not exist")
-    return db.session.query(Category).update(category)
+
+    db_old_category.type = category.type or db_old_category.type
+    db_old_category.name = category.name or db_old_category.name
+    db.session.flush()
+
+    return db_old_category

@@ -2,7 +2,7 @@ from fastapi import HTTPException, APIRouter
 from fastapi_sqlalchemy import db
 
 from .models.button import ButtonCreate, ButtonUpdate, ButtonGet
-from ..models.database import Button
+from ..models.database import Button, Category
 from .category import get_category
 
 button = APIRouter(
@@ -13,7 +13,7 @@ button = APIRouter(
 
 @button.post("/", response_model=ButtonCreate)
 def create_button(button: ButtonCreate):
-    db_category = get_category(category_id=button.category_id)
+    db_category = db.session.query(Category).filter(Category.id == button.category_id).one_or_none()
     if db_category is None:
         raise HTTPException(status_code=404, detail="Category does not exist")
     db_button = Button(category_id=button.category_id, name=button.name,
@@ -46,10 +46,14 @@ def remove_button(button_id: int):
 
  
 @button.patch("/{button_id}", response_model=ButtonGet)
-def update_button(button: ButtonUpdate):
-    db_old_button = db.session.query(Button).filter(button.id == button_id).one_or_none()
+def update_button(button: ButtonUpdate, button_id: int):
+    db_old_button = db.session.query(Button).filter(Button.id == button_id).one_or_none()
     if db_old_button is None:
         raise HTTPException(status_code=404, detail="Button does not exist")
-    # db_old_button.id = 
-    return db.session.query(Button).filter(Button.id == button.id).update(**button.dict(exclude_unset=True))
-    # db.session.flush()
+    db_old_button.category_id = button.category_id or db_old_button.category_id
+    db_old_button.icon = button.icon or db_old_button.icon
+    db_old_button.name = button.name or db_old_button.name
+    db.session.flush()
+
+    return db_old_button
+
