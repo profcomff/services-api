@@ -30,7 +30,7 @@ def get_buttons(skip: int = 0, limit: int = 100):
 
 @button.get("/{button_id}", response_model=ButtonGet)
 def get_button(button_id: int):
-    db_button = db.session.query(Button).filter(Button.id == button_id).first()
+    db_button = db.session.query(Button).filter(Button.id == button_id).one_or_none()
     if db_button is None:
         raise HTTPException(status_code=404, detail="Button does not exist")
     return db_button
@@ -44,10 +44,12 @@ def remove_button(button_id: int):
     db.session.delete(db_button)
     db.session.flush()
 
-
-@button.patch("/{button_id}", response_model=ButtonUpdate)
+ 
+@button.patch("/{button_id}", response_model=ButtonGet)
 def update_button(button: ButtonUpdate):
-    db_old_button = get_button(button_id=button.id)
-    db.session.query(Button).filter(Button.id == button.id).update(button).returning(**button.dict())
-    db.session.flush()
-    return db_old_button
+    db_old_button = db.session.query(Button).filter(button.id == button_id).one_or_none()
+    if db_old_button is None:
+        raise HTTPException(status_code=404, detail="Button does not exist")
+    # db_old_button.id = 
+    return db.session.query(Button).filter(Button.id == button.id).update(**button.dict(exclude_unset=True))
+    # db.session.flush()
