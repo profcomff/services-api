@@ -7,9 +7,6 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     """Application settings"""
-    # path = os.path.join(os.path.dirname(__file__), '../.env')
-    # load_dotenv(path)
-    # DB_DSN: PostgresDsn = os.environ.get('DATABASE_URL')
     DB_DSN: PostgresDsn = os.getenv('DATABASE_URL')
 
     CORS_ALLOW_ORIGINS: list[str] = ['*']

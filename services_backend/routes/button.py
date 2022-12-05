@@ -41,12 +41,13 @@ def remove_button(button_id: int):
     db_button = get_button(button_id=button_id)
     if db_button is None:
         raise HTTPException(status_code=404, detail="Button does not exist")
-    db.session.query(Button).filter(Button.id == button_id).first()
+    db.session.delete(db_button)
+    db.session.flush()
 
 
-@button.patch("/", response_model=ButtonUpdate)
+@button.patch("/{button_id}", response_model=ButtonUpdate)
 def update_button(button: ButtonUpdate):
     db_old_button = get_button(button_id=button.id)
-    if db_old_button is None:
-        raise HTTPException(status_code=404, detail="Button does not exist")
-    return db.session.query(Button).update(button)
+    db.session.query(Button).filter(Button.id == button.id).update(button).returning(**button.dict())
+    db.session.flush()
+    return db_old_button

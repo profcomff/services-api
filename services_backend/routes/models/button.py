@@ -9,13 +9,13 @@ class ButtonCreate(Base):
 
 
 class ButtonUpdate(Base):
-    id: int
+    id: Optional[int]
     category_id: Optional[int]
     icon: Optional[str]
     name: Optional[str]
 
 
-class ButtonGet(Base):  
+class ButtonGet(Base):
     id: int
     category_id: int
     icon: Optional[str]
