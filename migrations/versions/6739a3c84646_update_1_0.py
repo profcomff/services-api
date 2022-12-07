@@ -1,10 +1,3 @@
-"""Update 1.0
-
-Revision ID: 6739a3c84646
-Revises: 
-Create Date: 2022-12-02 16:02:15.329952
-
-"""
 from alembic import op
 import sqlalchemy as sa
 

@@ -1,21 +1,20 @@
 from .base import Base
-from typing import Optional
 
 
 class ButtonCreate(Base):
     category_id: int
-    icon: Optional[str]
-    name: Optional[str]
+    icon: str | None
+    name: str | None
 
 
 class ButtonUpdate(Base):
-    category_id: Optional[int]
-    icon: Optional[str]
-    name: Optional[str]
+    category_id: int | None
+    icon: str | None
+    name: str | None
 
 
 class ButtonGet(Base):
     id: int
     category_id: int
-    icon: Optional[str]
-    name: Optional[str]
+    icon: str | None
+    name: str | None

@@ -1,19 +1,18 @@
 from .base import Base
-from typing import Optional
 
 
 class CategoryCreate(Base):
-    type: Optional[str]
-    name: Optional[str]
+    type: str | None
+    name: str | None
 
 
 class CategoryUpdate(Base):
-    type: Optional[str]
-    name: Optional[str]
+    type: str | None
+    name: str | None
 
 
 class CategoryGet(Base):
     id: int
-    type: Optional[str]
-    name: Optional[str]
+    type: str | None
+    name: str | None
 

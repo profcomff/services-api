@@ -19,26 +19,25 @@ def create_category(category: CategoryCreate):
 
 
 @category.get("/", response_model=list[CategoryGet])
-def get_categories(skip: int = 0, limit: int = 100):
-    return db.session.query(Category).offset(skip).limit(limit).all()
+def get_categories(offset: int = 0, limit: int = 100):
+    return db.session.query(Category).offset(offset).limit(limit).all()
 
 
 @category.get("/{category_id}", response_model=CategoryGet)
 def get_category(category_id: int):
-    db_category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
-    if db_category is None:
+    category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
+    if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
-    return db_category
+    return category
 
 
-@category.delete("/")
+@category.delete("/{category_id}", response_model=None)
 def remove_category(category_id: int):
-    db_category = get_category(category_id=category_id)
-    if db_category is None:
+    category = get_category(category_id=category_id)
+    if category is None:
         raise HTTPException(status_code=404, detail="Category does not exist")
     delete = db.session.query(Category).filter(Category.id == category_id).one_or_none()
-    d = db.session.query(Button).filter(Button.category_id == category_id).all()
-    for button in d:
+    for button in db.session.query(Button).filter(Button.category_id == category_id).all():
         db.session.delete(button)
         db.session.flush()
     db.session.delete(delete)
@@ -46,13 +45,11 @@ def remove_category(category_id: int):
 
 
 @category.patch("/{category_id}", response_model=CategoryUpdate)
-def update_category(category: CategoryUpdate, category_id: int):
-    db_old_category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
-    if db_old_category is None:
+def update_category(category_inp: CategoryUpdate, category_id: int):
+    category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
+    if category is None:
         raise HTTPException(status_code=404, detail="Category does not exist")
-
-    db_old_category.type = category.type or db_old_category.type
-    db_old_category.name = category.name or db_old_category.name
+    category.type = category_inp.type or category.type
+    category.name = category_inp.name or category.name
     db.session.flush()
-
-    return db_old_category
+    return category
