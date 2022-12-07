@@ -36,7 +36,7 @@ def get_button(button_id: int):
 
 @button.delete("/{button_id}", response_model=None)
 def remove_button(button_id: int):
-    button = get_button(button_id=button_id)
+    button = db.session.query(Button).filter(Button.id == button_id).one_or_none()
     if not button:
         raise HTTPException(status_code=404, detail="Button does not exist")
     db.session.delete(button)
