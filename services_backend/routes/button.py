@@ -15,8 +15,7 @@ def create_button(button_inp: ButtonCreate):
     category = db.session.query(Category).filter(Category.id == button_inp.category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
-    button = Button(category_id=button_inp.category_id, name=button_inp.name,
-                             icon=button_inp.icon)
+    button = Button(**button_inp.dict())
     db.session.add(button)
     db.session.flush()
     return button
