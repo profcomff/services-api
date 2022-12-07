@@ -1,0 +1,20 @@
+version: "1.0"
+
+services:
+ db:
+   image: postgres:13.3
+   ports:
+     - "127.0.0.1:5432:5432"
+   environment:
+     - POSTGRES_PASSWORD=123
+
+ api:
+   build: .
+   env_file: .env.
+   command: bash -c "alembic upgrade head && uvicorn services_backend.__main__:app --reload"
+   volumes:
+     - .:/app
+   ports:
+     - "127.0.0.1:8000:8000"
+   depends_on:
+     - db
