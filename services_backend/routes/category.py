@@ -11,11 +11,11 @@ category = APIRouter(
 
 
 @category.post("/", response_model=CategoryCreate)
-def create_category(category: CategoryCreate):
-    db_category = Category(type=category.type, name=category.name)
-    db.session.add(db_category)
+def create_category(category_inp: CategoryCreate):
+    category = Category(**category_inp.dict())
+    db.session.add(category)
     db.session.flush()
-    return db_category
+    return category
 
 
 @category.get("/", response_model=list[CategoryGet])
