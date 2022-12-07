@@ -4,11 +4,7 @@ from fastapi_sqlalchemy import db
 from .models.category import CategoryCreate, CategoryUpdate, CategoryGet
 from ..models.database import Category, Button
 
-category = APIRouter(
-    tags=["category"],
-    responses={200: {"description": "Ok"}}
-)
-
+category = APIRouter()
 
 @category.post("/", response_model=CategoryCreate)
 def create_category(category_inp: CategoryCreate):

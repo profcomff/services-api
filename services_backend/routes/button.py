@@ -4,10 +4,7 @@ from fastapi_sqlalchemy import db
 from .models.button import ButtonCreate, ButtonUpdate, ButtonGet
 from ..models.database import Button, Category
 
-button = APIRouter(
-    tags=["button"],
-    responses={200: {"description": "Ok"}}
-)
+button = APIRouter()
 
 
 @button.post("/", response_model=ButtonCreate)
