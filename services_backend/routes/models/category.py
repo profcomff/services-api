@@ -1,4 +1,5 @@
 from .base import Base
+from .button import ButtonGet
 
 
 class CategoryCreate(Base):
@@ -15,4 +16,5 @@ class CategoryGet(Base):
     id: int
     type: str | None
     name: str | None
+    button: list[ButtonGet]
 
