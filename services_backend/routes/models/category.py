@@ -16,5 +16,5 @@ class CategoryGet(Base):
     id: int
     type: str | None
     name: str | None
-    button: list[ButtonGet]
+    buttons: list[ButtonGet]
 
