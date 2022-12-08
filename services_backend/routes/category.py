@@ -6,7 +6,8 @@ from ..models.database import Category, Button
 
 category = APIRouter()
 
-@category.post("/", response_model=CategoryCreate)
+
+@category.post("/", response_model=CategoryGet)
 def create_category(category_inp: CategoryCreate):
     category = Category(**category_inp.dict())
     db.session.add(category)

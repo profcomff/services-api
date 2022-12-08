@@ -7,7 +7,7 @@ from ..models.database import Button, Category
 button = APIRouter()
 
 
-@button.post("/", response_model=ButtonCreate)
+@button.post("/", response_model=ButtonGet)
 def create_button(button_inp: ButtonCreate):
     category = db.session.query(Category).filter(Category.id == button_inp.category_id).one_or_none()
     if not category:
