@@ -39,7 +39,7 @@ def remove_button(button_id: int):
     db.session.delete(button)
     db.session.flush()
 
- 
+
 @button.patch("/{button_id}", response_model=ButtonGet)
 def update_button(button_inp: ButtonUpdate, button_id: int):
     button = db.session.query(Button).filter(Button.id == button_id).one_or_none()

@@ -24,5 +24,3 @@ def db_button(dbsession, db_category):
     if query.one_or_none():
         dbsession.delete(query.one())
     dbsession.flush()
-
-

@@ -20,10 +20,7 @@ class TestCategory:
         assert res_body[0]['buttons'] == []
 
     def test_post_success(self, client, dbsession):
-        body = {
-            "type": "string",
-            "name": "string"
-        }
+        body = {"type": "string", "name": "string"}
         res = client.post(self._url, data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
         res_body = res.json()
@@ -53,10 +50,7 @@ class TestCategory:
         assert get_res.status_code == status.HTTP_404_NOT_FOUND
 
     def test_patch_by_id_success(self, client, db_category, dbsession):
-        body = {
-            "type": "string",
-            "name": "string"
-        }
+        body = {"type": "string", "name": "string"}
         res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
         res_body = res.json()
@@ -68,7 +62,6 @@ class TestCategory:
         assert db_category_patched.name == body["name"]
         assert db_category_patched.type == body["type"]
 
-
     def test_get_by_id_not_found(self, client, db_category):
         res = client.get(f'{self._url}{db_category.id + 1}')
         assert res.status_code == status.HTTP_404_NOT_FOUND
@@ -78,9 +71,6 @@ class TestCategory:
         assert res.status_code == status.HTTP_404_NOT_FOUND
 
     def test_patch_by_id_not_found(self, client, db_category):
-        body = {
-            "type": "string",
-            "name": "string"
-        }
+        body = {"type": "string", "name": "string"}
         res = client.patch(f"{self._url}{db_category.id + 1}", data=json.dumps(body))
         assert res.status_code == status.HTTP_404_NOT_FOUND

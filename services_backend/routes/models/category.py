@@ -17,4 +17,3 @@ class CategoryGet(Base):
     type: str | None
     name: str | None
     buttons: list[ButtonGet]
-
