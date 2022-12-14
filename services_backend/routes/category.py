@@ -43,10 +43,12 @@ def remove_category(category_id: int):
 
 @category.patch("/{category_id}", response_model=CategoryUpdate)
 def update_category(category_inp: CategoryUpdate, category_id: int):
-    category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
-    if category is None:
+    category = db.session.query(Category).filter(Category.id == category_id)
+    if not category.one_or_none():
         raise HTTPException(status_code=404, detail="Category does not exist")
-    category.type = category_inp.type or category.type
-    category.name = category_inp.name or category.name
+    category.update(
+        category_inp.dict(exclude_unset=True)
+    )
     db.session.flush()
-    return category
+    patched = category.one()
+    return patched

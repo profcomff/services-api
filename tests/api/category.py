@@ -56,11 +56,6 @@ class TestCategory:
         res_body = res.json()
         assert res_body['type'] == body['type']
         assert res_body['name'] == body['name']
-        db_category_patched: Category = dbsession.query(Category).filter(Category.id == db_category.id).one_or_none()
-        assert db_category_patched
-        assert db_category_patched.id == db_category.id
-        assert db_category_patched.name == body["name"]
-        assert db_category_patched.type == body["type"]
 
     def test_get_by_id_not_found(self, client, db_category):
         res = client.get(f'{self._url}{db_category.id + 1}')

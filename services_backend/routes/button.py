@@ -42,11 +42,12 @@ def remove_button(button_id: int):
 
 @button.patch("/{button_id}", response_model=ButtonGet)
 def update_button(button_inp: ButtonUpdate, button_id: int):
-    button = db.session.query(Button).filter(Button.id == button_id).one_or_none()
-    if not button:
+    button = db.session.query(Button).filter(Button.id == button_id)
+    if not button.one_or_none():
         raise HTTPException(status_code=404, detail="Button does not exist")
-    button.category_id = button_inp.category_id or button.category_id
-    button.icon = button_inp.icon or button.icon
-    button.name = button_inp.name or button.name
+    button.update(
+        button_inp.dict(exclude_unset=True)
+    )
     db.session.flush()
-    return button
+    patched = db.session.query(Button).filter(Button.id == button_id).one()
+    return patched

@@ -60,12 +60,6 @@ class TestButton:
         assert res_body["category_id"] == body["category_id"]
         assert res_body["icon"] == body["icon"]
         assert res_body["name"] == body["name"]
-        db_button_patched: Button = dbsession.query(Button).filter(Button.id == db_button.id).one_or_none()
-        assert db_button_patched
-        assert db_button_patched.id == db_button.id
-        assert db_button_patched.category_id == db_button.category_id
-        assert db_button_patched.icon == body["icon"]
-        assert db_button_patched.name == body["name"]
 
     def test_get_by_id_not_found(self, client, db_button):
         res = client.get(f'{self._url}{db_button.id + 1}')
