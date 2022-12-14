@@ -9,7 +9,8 @@ def db_category(dbsession):
     dbsession.flush()
     yield _category
     query = dbsession.query(Category).filter(Category.id == _category.id)
-    dbsession.delete(query.one())
+    if query.one_or_none():
+        dbsession.delete(query.one())
     dbsession.flush()
 
 
@@ -20,7 +21,8 @@ def db_button(dbsession, db_category):
     dbsession.flush()
     yield _button
     query = dbsession.query(Button).filter(Button.id == _button.id)
-    dbsession.delete(query.one())
+    if query.one_or_none():
+        dbsession.delete(query.one())
     dbsession.flush()
 
 
