@@ -4,7 +4,7 @@ from services_backend.models.database import Button, Category
 
 @pytest.fixture
 def db_category(dbsession):
-    _category = Category(id=1, name='categoty', type='some-type')
+    _category = Category(id=666, name='categoty', type='some-type')
     dbsession.add(_category)
     dbsession.flush()
     yield _category

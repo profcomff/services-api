@@ -15,7 +15,7 @@ class TestButton:
         assert len(res.json()) == 1
         assert res.json()[0]['id'] == db_button.id
 
-    def test_post_success(self, client, db_category):
+    def test_post_success(self, client, db_category, dbsession):
         body = {
             "category_id": db_category.id,
             "icon": "string",
