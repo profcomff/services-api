@@ -44,3 +44,19 @@ class TestCategory:
         }
         res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
+
+    def test_get_by_id_not_found(self, client, db_category):
+        res = client.get(f'{self._url}{db_category.id + 1}')
+        assert res.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_delete_by_id_not_found(self, client, db_category):
+        res = client.delete(f'{self._url}{db_category.id + 1}')
+        assert res.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_patch_by_id_not_found(self, client, db_category):
+        body = {
+            "type": "string",
+            "name": "string"
+        }
+        res = client.patch(f"{self._url}{db_category.id + 1}", data=json.dumps(body))
+        assert res.status_code == status.HTTP_404_NOT_FOUND

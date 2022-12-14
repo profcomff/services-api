@@ -46,3 +46,20 @@ class TestButton:
         }
         res = client.patch(f"{self._url}{db_button.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
+
+    def test_get_by_id_not_found(self, client, db_button):
+        res = client.get(f'{self._url}{db_button.id + 1}')
+        assert res.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_delete_by_id_not_found(self, client, db_button):
+        res = client.delete(f"{self._url}{db_button.id + 1}")
+        assert res.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_patch_by_id_not_found(self, client, db_button):
+        body = {
+            "category_id": db_button.category_id,
+            "icon": "cool icon",
+            "name": "nice name"
+        }
+        res = client.patch(f"{self._url}{db_button.id + 1}", data=json.dumps(body))
+        assert res.status_code == status.HTTP_404_NOT_FOUND
