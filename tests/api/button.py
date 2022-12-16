@@ -1,4 +1,3 @@
-import pytest
 import json
 from starlette import status
 from services_backend.settings import get_settings
@@ -60,6 +59,22 @@ class TestButton:
         assert res_body["category_id"] == body["category_id"]
         assert res_body["icon"] == body["icon"]
         assert res_body["name"] == body["name"]
+
+    def test_patch_unset_params(self, client, db_button, dbsession):
+        body = {}
+        res = client.patch(f"{self._url}{db_button.id}", data=json.dumps(body))
+        assert res.status_code == status.HTTP_400_BAD_REQUEST
+        body["category_id"] = db_button.category_id
+        body["icon"] = "string"
+        res = client.patch(f"{self._url}{db_button.id}", data=json.dumps(body))
+        assert res.status_code == status.HTTP_200_OK
+        assert res.json()["icon"] == body["icon"]
+        body_name = {
+            "name": "string"
+        }
+        res = client.patch(f"{self._url}{db_button.id}", data=json.dumps(body_name))
+        assert res.status_code == status.HTTP_200_OK
+        assert res.json()["name"] == body_name["name"]
 
     def test_get_by_id_not_found(self, client, db_button):
         res = client.get(f'{self._url}{db_button.id + 1}')

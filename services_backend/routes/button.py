@@ -45,9 +45,11 @@ def update_button(button_inp: ButtonUpdate, button_id: int):
     button = db.session.query(Button).filter(Button.id == button_id)
     if not button.one_or_none():
         raise HTTPException(status_code=404, detail="Button does not exist")
+    if not any(button_inp.dict().values()):
+        raise HTTPException(status_code=400, detail="Empty schema")
     button.update(
         button_inp.dict(exclude_unset=True)
     )
     db.session.flush()
-    patched = db.session.query(Button).filter(Button.id == button_id).one()
+    patched = button.one()
     return patched

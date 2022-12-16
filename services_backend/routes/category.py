@@ -46,6 +46,8 @@ def update_category(category_inp: CategoryUpdate, category_id: int):
     category = db.session.query(Category).filter(Category.id == category_id)
     if not category.one_or_none():
         raise HTTPException(status_code=404, detail="Category does not exist")
+    if not any(category_inp.dict().values()):
+        raise HTTPException(status_code=400, detail="Empty schema")
     category.update(
         category_inp.dict(exclude_unset=True)
     )

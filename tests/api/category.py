@@ -1,5 +1,5 @@
-import pytest
 import json
+import pytest
 from starlette import status
 from services_backend.settings import get_settings
 from services_backend.models.database import Category
@@ -56,6 +56,21 @@ class TestCategory:
         res_body = res.json()
         assert res_body['type'] == body['type']
         assert res_body['name'] == body['name']
+
+    def test_patch_unset_params(self, client, db_category, dbsession):
+        body = {}
+        res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body))
+        assert res.status_code == status.HTTP_400_BAD_REQUEST
+        body["type"] = "string"
+        res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body))
+        assert res.status_code == status.HTTP_200_OK
+        assert res.json()["type"] == body["type"]
+        body_name = {
+            "name": "string"
+        }
+        res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body_name))
+        assert res.status_code == status.HTTP_200_OK
+        assert res.json()["name"] == body_name["name"]
 
     def test_get_by_id_not_found(self, client, db_category):
         res = client.get(f'{self._url}{db_category.id + 1}')
