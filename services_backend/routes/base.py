@@ -11,10 +11,7 @@ app = FastAPI()
 
 
 app.add_middleware(
-    DBSessionMiddleware,
-    db_url=settings.DB_DSN,
-    session_args={"autocommit": True},
-    engine_args={"pool_pre_ping": True}
+    DBSessionMiddleware, db_url=settings.DB_DSN, session_args={"autocommit": True}, engine_args={"pool_pre_ping": True}
 )
 
 app.add_middleware(
@@ -25,5 +22,5 @@ app.add_middleware(
     allow_headers=settings.CORS_ALLOW_HEADERS,
 )
 
-app.include_router(button, prefix='/button', tags=["category"])
-app.include_router(category, prefix='/category', tags=["button"])
+app.include_router(button, prefix='/button', tags=["Button"])
+app.include_router(category, prefix='/category', tags=["Category"])
