@@ -59,16 +59,16 @@ def update_category(category_inp: CategoryUpdate, category_id: int):
     if not any(category_inp.dict().values()):
         raise HTTPException(status_code=400, detail="Empty schema")
 
-    if category.one_or_none().order > category_inp.order:
-        for categ in db.session.query(Category).filter(Category.order < category.one_or_none().order):
-            categ = db.session.query(Category).filter(Category.id == categ.id)
-            categ.update({"order": Category.order + 1})
+    if category.one().order > category_inp.order:
+        db.session.query(Category)\
+            .filter(Category.order < category.one().order)\
+            .update({"order": Category.order + 1})
 
-    elif category.one_or_none().order < category_inp.order:
-        for categ in db.session.query(Category).filter(Category.order > category.one_or_none().order):
-            categ = db.session.query(Category).filter(Category.id == categ.id)
-            categ.update({"order": Category.order - 1})
-
+    elif category.one().order < category_inp.order:
+        db.session.query(Category) \
+            .filter(Category.order > category.one().order) \
+            .update({"order": Category.order - 1})
+    
     category.update(
         category_inp.dict(exclude_unset=True)
     )
