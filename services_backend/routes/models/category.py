@@ -1,5 +1,3 @@
-import operator
-
 from .base import Base
 from .button import ButtonGet
 
