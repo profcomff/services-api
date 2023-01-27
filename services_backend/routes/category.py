@@ -1,3 +1,5 @@
+import operator
+
 from fastapi import HTTPException, APIRouter
 from fastapi_sqlalchemy import db
 
@@ -10,6 +12,10 @@ category = APIRouter()
 @category.post("/", response_model=CategoryGet)
 def create_category(category_inp: CategoryCreate):
     category = Category(**category_inp.dict())
+    for categ in db.session.query(Category).filter(Category.order >= category.order):
+        categ = db.session.query(Category).filter(Category.id == categ.id)
+        categ.update({"order": Category.order + 1})
+
     db.session.add(category)
     db.session.flush()
     return category
@@ -17,7 +23,7 @@ def create_category(category_inp: CategoryCreate):
 
 @category.get("/", response_model=list[CategoryGet])
 def get_categories(offset: int = 0, limit: int = 100):
-    return db.session.query(Category).offset(offset).limit(limit).all()
+    return sorted(db.session.query(Category).offset(offset).limit(limit).all(), key=operator.attrgetter("order"))
 
 
 @category.get("/{category_id}", response_model=CategoryGet)
@@ -33,11 +39,15 @@ def remove_category(category_id: int):
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if category is None:
         raise HTTPException(status_code=404, detail="Category does not exist")
-    delete = db.session.query(Category).filter(Category.id == category_id).one_or_none()
+
+    for categ in db.session.query(Category).filter(Category.order >= category.order):
+        categ = db.session.query(Category).filter(Category.id == categ.id)
+        categ.update({"order": Category.order - 1})
+
     for button in db.session.query(Button).filter(Button.category_id == category_id).all():
         db.session.delete(button)
         db.session.flush()
-    db.session.delete(delete)
+    db.session.delete(category)
     db.session.flush()
 
 
@@ -48,9 +58,19 @@ def update_category(category_inp: CategoryUpdate, category_id: int):
         raise HTTPException(status_code=404, detail="Category does not exist")
     if not any(category_inp.dict().values()):
         raise HTTPException(status_code=400, detail="Empty schema")
+
+    if category.one_or_none().order > category_inp.order:
+        for categ in db.session.query(Category).filter(Category.order < category.one_or_none().order):
+            categ = db.session.query(Category).filter(Category.id == categ.id)
+            categ.update({"order": Category.order + 1})
+
+    elif category.one_or_none().order < category_inp.order:
+        for categ in db.session.query(Category).filter(Category.order > category.one_or_none().order):
+            categ = db.session.query(Category).filter(Category.id == categ.id)
+            categ.update({"order": Category.order - 1})
+
     category.update(
         category_inp.dict(exclude_unset=True)
     )
     db.session.flush()
-    patched = category.one()
-    return patched
+    return category.one()
