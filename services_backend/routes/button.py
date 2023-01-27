@@ -24,7 +24,7 @@ def create_button(button_inp: ButtonCreate):
 
 @button.get("/", response_model=list[ButtonGet])
 def get_buttons(offset: int = 0, limit: int = 100):
-    return sorted(db.session.query(Button).offset(offset).limit(limit).all(), key=attrgetter("order"))
+    return db.session.query(Button).offset(offset).limit(limit).all().order_by(Button.order)
 
 
 @button.get("/{button_id}", response_model=ButtonGet)
