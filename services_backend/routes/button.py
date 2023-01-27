@@ -55,15 +55,15 @@ def update_button(button_inp: ButtonUpdate, button_id: int):
     if not any(button_inp.dict().values()):
         raise HTTPException(status_code=400, detail="Empty schema")
 
-    if button.one_or_none().order > button_inp.order:
-        for but in db.session.query(Button).filter(Button.order < button.one_or_none().order):
-            but = db.session.query(Button).filter(Button.id == but.id)
-            but.update({"order": Button.order + 1})
+    if button.one().order > button_inp.order:
+        db.session.query(Button) \
+            .filter(Button.order < button.one().order) \
+            .update({"order": Button.order + 1})
 
-    elif button.one_or_none().order < button_inp.order:
-        for but in db.session.query(Button).filter(Button.order > button.one_or_none().order):
-            but = db.session.query(Button).filter(Button.id == but.id)
-            but.update({"order": Button.order - 1})
+    elif button.one().order < button_inp.order:
+        db.session.query(Button) \
+            .filter(Button.order > button.one().order) \
+            .update({"order": Button.order - 1})
 
     button.update(
         button_inp.dict(exclude_unset=True)
