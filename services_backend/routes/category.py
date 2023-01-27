@@ -23,7 +23,7 @@ def create_category(category_inp: CategoryCreate):
 
 @category.get("/", response_model=list[CategoryGet])
 def get_categories(offset: int = 0, limit: int = 100):
-    return sorted(db.session.query(Category).offset(offset).limit(limit).all(), key=operator.attrgetter("order"))
+    return db.session.query(Category).offset(offset).limit(limit).all().order_by(Category.order)
 
 
 @category.get("/{category_id}", response_model=CategoryGet)
