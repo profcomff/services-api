@@ -18,12 +18,13 @@ def create_category(category_inp: CategoryCreate):
 
     db.session.add(category)
     db.session.flush()
+    db.session.commit()
     return category
 
 
 @category.get("/", response_model=list[CategoryGet])
 def get_categories(offset: int = 0, limit: int = 100):
-    return db.session.query(Category).offset(offset).limit(limit).all().order_by(Category.order)
+    return db.session.query(Category).order_by(Category.order).offset(offset).limit(limit).all()
 
 
 @category.get("/{category_id}", response_model=CategoryGet)
@@ -49,6 +50,7 @@ def remove_category(category_id: int):
         db.session.flush()
     db.session.delete(category)
     db.session.flush()
+    db.session.commit()
 
 
 @category.patch("/{category_id}", response_model=CategoryUpdate)
@@ -73,4 +75,5 @@ def update_category(category_inp: CategoryUpdate, category_id: int):
         category_inp.dict(exclude_unset=True)
     )
     db.session.flush()
+    db.session.commit()
     return category.one()
