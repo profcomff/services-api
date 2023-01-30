@@ -3,7 +3,6 @@ from fastapi_sqlalchemy import db
 
 from .models.button import ButtonCreate, ButtonUpdate, ButtonGet
 from ..models.database import Button, Category
-from operator import attrgetter
 
 button = APIRouter()
 
