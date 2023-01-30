@@ -15,7 +15,7 @@ class Category(Base):
 class Button(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String)
-    order: Mapped[str] = mapped_column(String)
+    order: Mapped[int] = mapped_column(Integer)
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey(Category.id))
     category: Mapped[Category] = relationship("Category", back_populates="buttons", foreign_keys=[category_id])
     icon: Mapped[str] = mapped_column(String)

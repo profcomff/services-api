@@ -13,11 +13,25 @@ def client():
     return client
 
 
-@pytest.fixture(scope='session')
-def dbsession() -> Session:
-    settings = get_settings()
-    engine = create_engine(settings.DB_DSN)
-    TestingSessionLocal = sessionmaker(bind=engine)
-    Base.metadata.create_all(bind=engine)
-    yield TestingSessionLocal()
-    Base.metadata.drop_all(bind=engine)
+
+@pytest.fixture(scope="session")
+def engine():
+    return create_engine(
+        get_settings().DB_DSN, execution_options={"isolation_level": "AUTOCOMMIT"}
+    )
+
+
+@pytest.fixture(scope="session")
+def tables(engine):
+    Base.metadata.create_all(engine)
+    yield
+    Base.metadata.drop_all(engine)
+
+
+@pytest.fixture(scope="session")
+def dbsession(engine, tables):
+    connection = engine.connect()
+    session = Session(bind=connection, autoflush=True)
+    yield session
+    session.close()
+    connection.close()

@@ -1,11 +1,13 @@
 import pytest
+import sqlalchemy
+
 from services_backend.models.database import Button, Category
 
 
 @pytest.fixture
 def db_category(dbsession):
-    _category = Category(id=666, name='categoty', type='some-type')
-    dbsession.add(_category)
+    q = sqlalchemy.insert(Category).values(id=666, name='category', type='some-type', order=0).returning(Category)
+    _category = dbsession.scalar(q)
     dbsession.flush()
     yield _category
     query = dbsession.query(Category).filter(Category.id == _category.id)
@@ -16,8 +18,8 @@ def db_category(dbsession):
 
 @pytest.fixture
 def db_button(dbsession, db_category):
-    _button = Button(id=42, name='button', category_id=db_category.id)
-    dbsession.add(_button)
+    q = sqlalchemy.insert(Button).values(id=42, name='button', category_id=db_category.id, order="32").returning(Button)
+    _button = dbsession.scalar(q)
     dbsession.flush()
     yield _button
     query = dbsession.query(Button).filter(Button.id == _button.id)
