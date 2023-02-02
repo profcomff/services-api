@@ -11,11 +11,8 @@ class ButtonUpdate(Base):
     category_id: int | None
     icon: str | None
     name: str | None
-<<<<<<< Updated upstream
-=======
     order: int | None
     link: dict | None
->>>>>>> Stashed changes
 
 
 class ButtonGet(Base):
