@@ -17,13 +17,6 @@ class Category(Base):
 
 
 class Button(Base):
-<<<<<<< Updated upstream
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    category_id = Column(Integer, ForeignKey(Category.id))
-    category = relationship("Category", back_populates="buttons", foreign_keys=[category_id])
-    icon = Column(String)
-=======
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String)
     order: Mapped[int] = mapped_column(Integer)
@@ -31,4 +24,3 @@ class Button(Base):
     category: Mapped[Category] = relationship("Category", back_populates="buttons", foreign_keys=[category_id])
     icon: Mapped[str] = mapped_column(String)
     link: Mapped[dict] = mapped_column(PickleType)
->>>>>>> Stashed changes

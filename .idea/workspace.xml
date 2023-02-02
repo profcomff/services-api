@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="58b6e0cf-c117-4ae3-8aea-5e22c4565311" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/migrations/versions/08acf991fb25_order.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/4c4c9c7f8e24_init.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/670f4caac7dd_init.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services_backend/models/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/services_backend/models/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services_backend/routes/button.py" beforeDir="false" afterPath="$PROJECT_DIR$/services_backend/routes/button.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services_backend/routes/models/button.py" beforeDir="false" afterPath="$PROJECT_DIR$/services_backend/routes/models/button.py" afterDir="false" />
-    </list>
+    <list default="true" id="58b6e0cf-c117-4ae3-8aea-5e22c4565311" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
