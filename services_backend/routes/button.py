@@ -13,6 +13,13 @@ def create_button(button_inp: ButtonCreate):
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
     button = Button(**button_inp.dict())
+<<<<<<< Updated upstream
+=======
+
+    db.session.query(Button) \
+        .filter(Button.order < button_inp.order) \
+        .update({"order": Button.order + 1})
+>>>>>>> Stashed changes
     db.session.add(button)
     db.session.flush()
     return button
