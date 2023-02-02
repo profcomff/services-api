@@ -5,15 +5,18 @@ from .button import ButtonGet
 class CategoryCreate(Base):
     type: str | None
     name: str | None
+    order: int | None
 
 
 class CategoryUpdate(Base):
     type: str | None
     name: str | None
+    order: int | None
 
 
 class CategoryGet(Base):
     id: int
     type: str | None
     name: str | None
-    buttons: list[ButtonGet]
+    order: int | None
+    buttons: list[ButtonGet] | None

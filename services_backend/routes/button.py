@@ -18,12 +18,13 @@ def create_button(button_inp: ButtonCreate):
         .update({"order": Button.order + 1})
     db.session.add(button)
     db.session.flush()
+    db.session.commit()
     return button
 
 
 @button.get("/", response_model=list[ButtonGet])
 def get_buttons(offset: int = 0, limit: int = 100):
-    return db.session.query(Button).offset(offset).limit(limit).all()
+    return db.session.query(Button).order_by(Button.order).offset(offset).limit(limit).all()
 
 
 @button.get("/{button_id}", response_model=ButtonGet)
@@ -41,6 +42,7 @@ def remove_button(button_id: int):
         raise HTTPException(status_code=404, detail="Button does not exist")
     db.session.delete(button)
     db.session.flush()
+    db.session.commit()
 
 
 @button.patch("/{button_id}", response_model=ButtonGet)
@@ -50,9 +52,18 @@ def update_button(button_inp: ButtonUpdate, button_id: int):
         raise HTTPException(status_code=404, detail="Button does not exist")
     if not any(button_inp.dict().values()):
         raise HTTPException(status_code=400, detail="Empty schema")
+
+    if button.one().order > button_inp.order:
+        db.session.query(Button) \
+            .filter(Button.order < button.one().order) \
+            .update({"order": Button.order + 1})
+    elif button.one().order < button_inp.order:
+        db.session.query(Button) \
+            .filter(Button.order > button.one().order) \
+            .update({"order": Button.order - 1})
     button.update(
         button_inp.dict(exclude_unset=True)
     )
     db.session.flush()
-    patched = button.one()
-    return patched
+    db.session.commit()
+    return button.one()

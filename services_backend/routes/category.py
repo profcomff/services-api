@@ -12,12 +12,13 @@ def create_category(category_inp: CategoryCreate):
     category = Category(**category_inp.dict())
     db.session.add(category)
     db.session.flush()
+    db.session.commit()
     return category
 
 
 @category.get("/", response_model=list[CategoryGet])
 def get_categories(offset: int = 0, limit: int = 100):
-    return db.session.query(Category).offset(offset).limit(limit).all()
+    return db.session.query(Category).order_by(Category.order).offset(offset).limit(limit).all()
 
 
 @category.get("/{category_id}", response_model=CategoryGet)
@@ -39,6 +40,7 @@ def remove_category(category_id: int):
         db.session.flush()
     db.session.delete(delete)
     db.session.flush()
+    db.session.commit()
 
 
 @category.patch("/{category_id}", response_model=CategoryUpdate)
@@ -48,9 +50,19 @@ def update_category(category_inp: CategoryUpdate, category_id: int):
         raise HTTPException(status_code=404, detail="Category does not exist")
     if not any(category_inp.dict().values()):
         raise HTTPException(status_code=400, detail="Empty schema")
+
+    if category.one().order > category_inp.order:
+        db.session.query(Category) \
+            .filter(Category.order < category.one().order) \
+            .update({"order": Category.order + 1})
+    elif category.one().order < category_inp.order:
+        db.session.query(Category) \
+            .filter(Category.order > category.one().order) \
+            .update({"order": Category.order - 1})
+
     category.update(
         category_inp.dict(exclude_unset=True)
     )
     db.session.flush()
-    patched = category.one()
-    return patched
+    db.session.commit()
+    return category.one()
