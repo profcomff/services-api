@@ -17,19 +17,22 @@ class TestCategory:
         assert res_body[0]['id'] == db_category.id
         assert res_body[0]['type'] == db_category.type
         assert res_body[0]['name'] == db_category.name
+        assert res_body[0]['order'] == db_category.order
         assert res_body[0]['buttons'] == []
 
     def test_post_success(self, client, dbsession):
-        body = {"type": "string", "name": "string"}
+        body = {"type": "string", "name": "string", "order": 1}
         res = client.post(self._url, data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
         res_body = res.json()
         assert res_body["type"] == body["type"]
         assert res_body["name"] == body["name"]
+        assert res_body["order"] == body["order"]
         db_category_created: Category = dbsession.query(Category).filter(Category.name == body["name"]).one_or_none()
         assert db_category_created
         assert db_category_created.name == body["name"]
         assert db_category_created.type == body["type"]
+        assert db_category_created.order == body["order"]
         assert db_category_created.buttons == []
 
     def test_get_by_id_success(self, client, db_category):
@@ -39,6 +42,7 @@ class TestCategory:
         assert res_body['id'] == db_category.id
         assert res_body['type'] == db_category.type
         assert res_body['name'] == db_category.name
+        assert res_body['order'] == db_category.order
         assert res_body['buttons'] == []
 
     def test_delete_by_id_success(self, client, dbsession, db_category):
@@ -50,30 +54,31 @@ class TestCategory:
         assert get_res.status_code == status.HTTP_404_NOT_FOUND
 
     def test_patch_by_id_success(self, client, db_category, dbsession):
-        body = {"type": "string", "name": "string"}
+        body = {"type": "test", "name": "test", "order": 3}
         res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
         res_body = res.json()
         assert res_body['type'] == body['type']
         assert res_body['name'] == body['name']
+        assert res_body['order'] == body['order']
 
     def test_patch_unset_params(self, client, db_category, dbsession):
         body = {}
         res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_400_BAD_REQUEST
-        body["type"] = "string"
+        body["order"] = 1
         res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
-        assert res.json()["type"] == body["type"]
-        body_name = {
-            "name": "string"
+        assert res.json()["order"] == body["order"]
+        body_ord = {
+            "order": 4
         }
-        res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body_name))
+        res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body_ord))
         assert res.status_code == status.HTTP_200_OK
-        assert res.json()["name"] == body_name["name"]
+        assert res.json()["order"] == body_ord["order"]
 
     def test_get_by_id_not_found(self, client, db_category):
-        res = client.get(f'{self._url}{db_category.id + 1}')
+        res = client.get(f'{self._url}/{db_category.id + 1}')
         assert res.status_code == status.HTTP_404_NOT_FOUND
 
     def test_delete_by_id_not_found(self, client, db_category):
@@ -81,6 +86,6 @@ class TestCategory:
         assert res.status_code == status.HTTP_404_NOT_FOUND
 
     def test_patch_by_id_not_found(self, client, db_category):
-        body = {"type": "string", "name": "string"}
+        body = {"type": "string", "name": "string", "order": 1}
         res = client.patch(f"{self._url}{db_category.id + 1}", data=json.dumps(body))
         assert res.status_code == status.HTTP_404_NOT_FOUND
