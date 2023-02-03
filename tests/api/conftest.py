@@ -13,9 +13,7 @@ def db_category(dbsession):
     if query:
         for button in dbsession.query(Button).filter(Button.category_id == category.id).all():
             dbsession.delete(button)
-            dbsession.flush()
         dbsession.delete(query)
-        dbsession.flush()
         dbsession.commit()
 
 
@@ -23,11 +21,9 @@ def db_category(dbsession):
 def db_button(dbsession, db_category):
     _button = Button(id=42, name='button', category_id=db_category.id, order=1, icon='test', link='g', type='d')
     dbsession.add(_button)
-    dbsession.flush()
     dbsession.commit()
     yield _button
     query = dbsession.query(Button).filter(Button.id == _button.id).one_or_none()
     if query:
         dbsession.delete(query)
-        dbsession.flush()
         dbsession.commit()
