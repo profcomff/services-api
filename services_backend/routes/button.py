@@ -17,9 +17,8 @@ def create_button(button_inp: ButtonCreate):
         .filter(Button.order < button_inp.order) \
         .update({"order": Button.order + 1})
     db.session.add(button)
-    db.session.flush()
-    db.session.commit()
     return button
+    db.session.commit()
 
 
 @button.get("/", response_model=list[ButtonGet])
@@ -41,7 +40,6 @@ def remove_button(button_id: int):
     if not button:
         raise HTTPException(status_code=404, detail="Button does not exist")
     db.session.delete(button)
-    db.session.flush()
     db.session.commit()
 
 
@@ -64,6 +62,5 @@ def update_button(button_inp: ButtonUpdate, button_id: int):
     button.update(
         button_inp.dict(exclude_unset=True)
     )
-    db.session.flush()
-    db.session.commit()
     return button.one()
+    db.session.commit()
