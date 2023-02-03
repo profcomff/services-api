@@ -11,9 +11,8 @@ category = APIRouter()
 def create_category(category_inp: CategoryCreate):
     category = Category(**category_inp.dict())
     db.session.add(category)
-    db.session.flush()
-    db.session.commit()
     return category
+    db.session.commit()
 
 
 @category.get("/", response_model=list[CategoryGet])
@@ -39,7 +38,6 @@ def remove_category(category_id: int):
         db.session.delete(button)
         db.session.flush()
     db.session.delete(delete)
-    db.session.flush()
     db.session.commit()
 
 
@@ -63,6 +61,5 @@ def update_category(category_inp: CategoryUpdate, category_id: int):
     category.update(
         category_inp.dict(exclude_unset=True)
     )
-    db.session.flush()
-    db.session.commit()
     return category.one()
+    db.session.commit()
