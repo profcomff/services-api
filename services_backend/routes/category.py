@@ -45,6 +45,9 @@ def remove_category(category_id: int):
     for button in db.session.query(Button).filter(Button.category_id == category_id).all():
         db.session.delete(button)
         db.session.flush()
+    db.session.query(Category) \
+        .filter(Category.order > category.order) \
+        .update({"order": Category.order - 1})
     db.session.delete(delete)
     db.session.commit()
 
@@ -59,15 +62,16 @@ def update_category(category_inp: CategoryUpdate, category_id: int):
 
     if category.one().order > category_inp.order:
         db.session.query(Category) \
-            .filter(Category.order <= category.one().order) \
+            .filter(Category.order < category.one().order) \
             .update({"order": Category.order + 1})
     elif category.one().order < category_inp.order:
         db.session.query(Category) \
-            .filter(Category.order >= category.one().order) \
+            .filter(Category.order > category.one().order) \
             .update({"order": Category.order - 1})
 
     category.update(
         category_inp.dict(exclude_unset=True)
     )
+    ret = category.one()
     db.session.commit()
-    return category.one()
+    return ret
