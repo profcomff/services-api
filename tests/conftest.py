@@ -21,4 +21,3 @@ def dbsession() -> Session:
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     yield TestingSessionLocal()
-    Base.metadata.drop_all(bind=engine)
