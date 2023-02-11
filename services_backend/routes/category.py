@@ -9,10 +9,18 @@ category = APIRouter()
 
 @category.post("/", response_model=CategoryGet)
 def create_category(category_inp: CategoryCreate):
+    last_category = db.session.query(Category).order_by(Category.order.desc()).first()
     category = Category(**category_inp.dict())
+    if last_category:
+        if category.order > last_category.order+1:
+            raise HTTPException(status_code=422, detail=f"There is no category with order {category.order}."
+                                                        f"Last order is {last_category.order}")
+    db.session.query(Category) \
+        .filter(Category.order <= category_inp.order) \
+        .update({"order": Category.order + 1})
     db.session.add(category)
-    return category
     db.session.commit()
+    return category
 
 
 @category.get("/", response_model=list[CategoryGet])
@@ -51,15 +59,15 @@ def update_category(category_inp: CategoryUpdate, category_id: int):
 
     if category.one().order > category_inp.order:
         db.session.query(Category) \
-            .filter(Category.order < category.one().order) \
+            .filter(Category.order <= category.one().order) \
             .update({"order": Category.order + 1})
     elif category.one().order < category_inp.order:
         db.session.query(Category) \
-            .filter(Category.order > category.one().order) \
+            .filter(Category.order >= category.one().order) \
             .update({"order": Category.order - 1})
 
     category.update(
         category_inp.dict(exclude_unset=True)
     )
-    return category.one()
     db.session.commit()
+    return category.one()

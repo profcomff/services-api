@@ -12,13 +12,17 @@ def create_button(button_inp: ButtonCreate):
     category = db.session.query(Category).filter(Category.id == button_inp.category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
+    last_button = db.session.query(Button).order_by(Button.order.desc()).first()
     button = Button(**button_inp.dict())
+    if last_button:
+        if button.order > last_button.order+1:
+            raise HTTPException(status_code=422, detail=f"There is no category with order {button.order}. Last order is {last_button.order}")
     db.session.query(Button) \
         .filter(Button.order < button_inp.order) \
         .update({"order": Button.order + 1})
     db.session.add(button)
-    return button
     db.session.commit()
+    return button
 
 
 @button.get("/", response_model=list[ButtonGet])
@@ -62,5 +66,5 @@ def update_button(button_inp: ButtonUpdate, button_id: int):
     button.update(
         button_inp.dict(exclude_unset=True)
     )
-    return button.one()
     db.session.commit()
+    return button.one()
