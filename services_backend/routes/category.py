@@ -13,7 +13,7 @@ def create_category(category_inp: CategoryCreate):
     category = Category(**category_inp.dict())
     if last_category:
         if category.order > last_category.order+1:
-            raise HTTPException(status_code=422, detail=f"There is no category with order {category.order}."
+            raise HTTPException(status_code=400, detail=f"There is no category with order {category.order}."
                                                         f"Last order is {last_category.order}")
     db.session.query(Category) \
         .filter(Category.order <= category_inp.order) \

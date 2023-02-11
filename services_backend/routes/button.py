@@ -16,7 +16,7 @@ def create_button(button_inp: ButtonCreate):
     button = Button(**button_inp.dict())
     if last_button:
         if button.order > last_button.order+1:
-            raise HTTPException(status_code=422, detail=f"There is no category with order {button.order}. Last order is {last_button.order}")
+            raise HTTPException(status_code=400, detail=f"There is no category with order {button.order}. Last order is {last_button.order}")
     db.session.query(Button) \
         .filter(Button.order < button_inp.order) \
         .update({"order": Button.order + 1})
