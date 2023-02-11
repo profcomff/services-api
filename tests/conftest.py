@@ -18,4 +18,7 @@ def dbsession() -> Session:
     settings = get_settings()
     engine = create_engine(settings.DB_DSN, execution_options={"isolation_level": "AUTOCOMMIT"})
     TestingSessionLocal = sessionmaker(bind=engine)
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
     yield TestingSessionLocal()
+    Base.metadata.drop_all(bind=engine)

@@ -140,10 +140,9 @@ class TestButton:
             "name": db_button.name,
             "order": 1,
         }
-        res = client.patch(f"{self._url}{res1.json()['order']}", data=json.dumps(body_patch))
+        res = client.patch(f"{self._url}{res1.json()['id']}", data=json.dumps(body_patch))
         assert res.status_code == status.HTTP_200_OK
         assert res.json()["order"] == 1
 
-        res = client.get(f"{self._url}{db_button}")
+        res = client.get(f"{self._url}{db_button.id}")
         assert res.json()["order"] == 2
-        
