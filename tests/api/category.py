@@ -1,5 +1,4 @@
 import json
-import pytest
 from starlette import status
 from services_backend.settings import get_settings
 from services_backend.models.database import Category
@@ -53,7 +52,7 @@ class TestCategory:
         get_res = client.get(f'{self._url}{db_category.id}')
         assert get_res.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_patch_by_id_success(self, client, db_category, dbsession):
+    def test_patch_by_id_success(self, client, db_category):
         body = {"type": "test", "name": "test", "order": 1}
         res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
@@ -62,7 +61,7 @@ class TestCategory:
         assert res_body['name'] == body['name']
         assert res_body['order'] == body['order']
 
-    def test_patch_unset_params(self, client, db_category, dbsession):
+    def test_patch_unset_params(self, client, db_category):
         body = {}
         res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_400_BAD_REQUEST
@@ -90,7 +89,7 @@ class TestCategory:
         res = client.patch(f"{self._url}{db_category.id + 1}", data=json.dumps(body))
         assert res.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_create_first(self, client, dbsession, db_category):
+    def test_create_first(self, client, db_category):
         body = {
             "name": "test",
             "type": "test",
@@ -105,7 +104,7 @@ class TestCategory:
         res_old = client.get(f"{self._url}{db_category.id}")
         assert res_old.json()["order"] == 2
 
-    def test_patch_order(self, client, db_category, dbsession):
+    def test_patch_order(self, client, db_category):
         body = {
             "name": "new",
             "type": "test",
@@ -119,7 +118,7 @@ class TestCategory:
         res = client.get(f"{self._url}{db_category.id}")
         assert res.json()["order"] == 2
 
-    def test_create_third_fail(self, dbsession, db_category, client):
+    def test_create_third_fail(self, db_category, client):
         body = {
             "name": "new",
             "type": "test",
@@ -129,7 +128,7 @@ class TestCategory:
         res = client.patch(f"{self._url}{res1.json()['id']}", data=json.dumps({"order": 33}))
         assert res.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_create_negative_order_fail(self, dbsession, db_category, client):
+    def test_create_negative_order_fail(self, db_category, client):
         body = {
             "name": "new",
             "type": "test",
@@ -139,7 +138,7 @@ class TestCategory:
         res = client.patch(f"{self._url}{res1.json()['id']}", data=json.dumps({"order": -1}))
         assert res.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_delete_order(self, db_category, client, dbsession):
+    def test_delete_order(self, db_category, client):
         body = {
             "name": "new",
             "type": "test",
