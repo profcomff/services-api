@@ -114,49 +114,44 @@ class TestButton:
             "name": "test",
             "link": "test",
             "type": "test",
-            "order": 1
         }
 
         res = client.post(self._url, data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
-        assert res.json()["order"] == body["order"]
 
+        res = client.patch(self._url, data=json.dumps({"order": 1}))
+        assert res.json()["order"] == 1
         res_old = client.get(f"{self._url}{db_button.id}")
         assert res_old.json()["order"] == 2
 
-    def test_patch_order(self, client, db_button, dbsession):
+    def test_patch_order_fail(self, client, db_button, dbsession):
         body = {
             "category_id": db_button.category_id,
             "icon": "test",
             "name": "new",
             "link": "test",
             "type": "test",
-            "order": 2
         }
         res1 = client.post(self._url, data=json.dumps(body))
         assert res1.status_code == status.HTTP_200_OK
 
         body_patch = {
             "name": db_button.name,
-            "order": 1,
+            "order": 44,
         }
         res = client.patch(f"{self._url}{res1.json()['id']}", data=json.dumps(body_patch))
-        assert res.status_code == status.HTTP_200_OK
-        assert res.json()["order"] == 1
+        assert res.status_code == status.HTTP_400_BAD_REQUEST
 
-        res = client.get(f"{self._url}{db_button.id}")
-        assert res.json()["order"] == 2
-
-    def test_create_third_fail(self, dbsession, db_button, client):
+    def test_patch_negative_order_fail(self, dbsession, db_button, client):
         body = {
             "category_id": db_button.category_id,
             "icon": "test",
             "name": "new",
             "link": "test",
             "type": "test",
-            "order": 3
         }
-        res1 = client.post(self._url, data=json.dumps(body))
+        client.post(self._url, data=json.dumps(body))
+        res1 = client.patch(self._url, data=json.dumps({"order": -10}))
         assert res1.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_delete_order(self, db_button, client, dbsession):
@@ -166,7 +161,6 @@ class TestButton:
             "name": "new",
             "link": "test",
             "type": "test",
-            "order": 1
         }
         res1 = client.post(self._url, data=json.dumps(body))
         assert res1.status_code == status.HTTP_200_OK
@@ -175,4 +169,4 @@ class TestButton:
         assert res.status_code == status.HTTP_200_OK
 
         res = client.get(f"{self._url}{db_button.id}")
-        assert res.json()['order'] == body['order']
+        assert res.json()['order'] == 1

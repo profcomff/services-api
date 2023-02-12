@@ -12,12 +12,9 @@ def create_category(category_inp: CategoryCreate):
     last_category = db.session.query(Category).order_by(Category.order.desc()).first()
     category = Category(**category_inp.dict())
     if last_category:
-        if category.order > last_category.order+1:
-            raise HTTPException(status_code=400, detail=f"There is no category with order {category.order}."
-                                                        f"Last order is {last_category.order}")
-    db.session.query(Category) \
-        .filter(Category.order <= category_inp.order) \
-        .update({"order": Category.order + 1})
+        category.order = last_category.order + 1
+    else:
+        category.order = 1
     db.session.add(category)
     db.session.commit()
     return category
@@ -55,10 +52,17 @@ def remove_category(category_id: int):
 @category.patch("/{category_id}", response_model=CategoryUpdate)
 def update_category(category_inp: CategoryUpdate, category_id: int):
     category = db.session.query(Category).filter(Category.id == category_id)
+    last_category = db.session.query(Category).order_by(Category.order.desc()).first()
     if not category.one_or_none():
         raise HTTPException(status_code=404, detail="Category does not exist")
     if not any(category_inp.dict().values()):
         raise HTTPException(status_code=400, detail="Empty schema")
+    if category_inp.order < 1:
+        raise HTTPException(status_code=400,
+                            detail="Order can`t be less than 1")
+    if last_category and (category_inp.order > last_category.order):
+        raise HTTPException(status_code=400, detail=f"Can`t create category with order {category_inp.order}. "
+                                                    f"Last category is {last_category.order}")
 
     if category.one().order > category_inp.order:
         db.session.query(Category) \

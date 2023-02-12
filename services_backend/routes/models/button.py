@@ -3,7 +3,6 @@ from .base import Base
 
 class ButtonCreate(Base):
     category_id: int
-    order: int
     icon: str | None
     name: str | None
     link: str | None

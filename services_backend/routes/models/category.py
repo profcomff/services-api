@@ -5,7 +5,6 @@ from .button import ButtonGet
 class CategoryCreate(Base):
     type: str | None
     name: str | None
-    order: int | None
 
 
 class CategoryUpdate(Base):
@@ -16,7 +15,7 @@ class CategoryUpdate(Base):
 
 class CategoryGet(Base):
     id: int
+    order: int
     type: str | None
     name: str | None
-    order: int | None
     buttons: list[ButtonGet] | None

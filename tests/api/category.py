@@ -21,18 +21,18 @@ class TestCategory:
         assert res_body[0]['buttons'] == []
 
     def test_post_success(self, client, dbsession):
-        body = {"type": "string", "name": "string", "order": 1}
+        body = {"type": "string", "name": "string"}
         res = client.post(self._url, data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
         res_body = res.json()
         assert res_body["type"] == body["type"]
         assert res_body["name"] == body["name"]
-        assert res_body["order"] == body["order"]
+        assert res_body["order"] == 1
         db_category_created: Category = dbsession.query(Category).filter(Category.name == body["name"]).one_or_none()
         assert db_category_created
         assert db_category_created.name == body["name"]
         assert db_category_created.type == body["type"]
-        assert db_category_created.order == body["order"]
+        assert db_category_created.order == 1
         assert db_category_created.buttons == []
 
     def test_get_by_id_success(self, client, db_category):
@@ -94,12 +94,11 @@ class TestCategory:
         body = {
             "name": "test",
             "type": "test",
-            "order": 1
         }
 
         res = client.post(self._url, data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
-        assert res.json()["order"] == body["order"]
+        assert res.json()["order"] == 1
 
         res_old = client.get(f"{self._url}{db_category.id}")
         assert res_old.json()["order"] == 2
@@ -108,7 +107,6 @@ class TestCategory:
         body = {
             "name": "new",
             "type": "test",
-            "order": 2
         }
         res1 = client.post(self._url, data=json.dumps(body))
         assert res1.status_code == status.HTTP_200_OK
@@ -133,11 +131,19 @@ class TestCategory:
         res1 = client.post(self._url, data=json.dumps(body))
         assert res1.status_code == status.HTTP_400_BAD_REQUEST
 
+    def test_create_negative_order_fail(self, dbsession, db_category, client):
+        body = {
+            "name": "new",
+            "type": "test",
+            "order": -1
+        }
+        res1 = client.post(self._url, data=json.dumps(body))
+        assert res1.status_code == status.HTTP_400_BAD_REQUEST
+
     def test_delete_order(self, db_category, client, dbsession):
         body = {
             "name": "new",
             "type": "test",
-            "order": 1
         }
         res1 = client.post(self._url, data=json.dumps(body))
         assert res1.status_code == status.HTTP_200_OK

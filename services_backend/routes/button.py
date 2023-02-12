@@ -15,11 +15,10 @@ def create_button(button_inp: ButtonCreate):
     last_button = db.session.query(Button).order_by(Button.order.desc()).first()
     button = Button(**button_inp.dict())
     if last_button:
-        if button.order > last_button.order+1:
-            raise HTTPException(status_code=400, detail=f"There is no category with order {button.order}. Last order is {last_button.order}")
-    db.session.query(Button) \
-        .filter(Button.order <= button_inp.order) \
-        .update({"order": Button.order + 1})
+        button.order = last_button.order + 1
+    else:
+        button.order = 1
+
     db.session.add(button)
     db.session.commit()
     return button
@@ -53,11 +52,17 @@ def remove_button(button_id: int):
 @button.patch("/{button_id}", response_model=ButtonGet)
 def update_button(button_inp: ButtonUpdate, button_id: int):
     button = db.session.query(Button).filter(Button.id == button_id)
+    last_button = db.session.query(Button).order_by(Button.order.desc()).first()
     if not button.one_or_none():
         raise HTTPException(status_code=404, detail="Button does not exist")
     if not any(button_inp.dict().values()):
         raise HTTPException(status_code=400, detail="Empty schema")
-
+    if last_button and (button_inp.order > last_button.order + 1):
+        raise HTTPException(status_code=400, detail=f"Can`t create button with order {button_inp.order}. "
+                                                    f"Last category is {last_button.order}")
+    if button_inp.order < 1:
+        raise HTTPException(status_code=400,
+                            detail="Order can`t be less than 1")
     if button.one().order > button_inp.order:
         db.session.query(Button) \
             .filter(Button.order < button.one().order) \
