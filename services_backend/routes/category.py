@@ -13,8 +13,6 @@ def create_category(category_inp: CategoryCreate):
     category = Category(**category_inp.dict())
     if last_category:
         category.order = last_category.order + 1
-    else:
-        category.order = 1
     db.session.add(category)
     db.session.commit()
     return category

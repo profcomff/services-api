@@ -16,9 +16,6 @@ def create_button(button_inp: ButtonCreate):
     button = Button(**button_inp.dict())
     if last_button:
         button.order = last_button.order + 1
-    else:
-        button.order = 1
-
     db.session.add(button)
     db.session.commit()
     return button

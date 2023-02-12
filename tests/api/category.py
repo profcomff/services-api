@@ -98,7 +98,9 @@ class TestCategory:
 
         res = client.post(self._url, data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
-        assert res.json()["order"] == 1
+        res1 = client.patch(f"{self._url}{res.json()['id']}", data=json.dumps({"order": 1}))
+        assert res1.status_code == status.HTTP_200_OK
+        assert res1.json()["order"] == 1
 
         res_old = client.get(f"{self._url}{db_category.id}")
         assert res_old.json()["order"] == 2
@@ -110,12 +112,7 @@ class TestCategory:
         }
         res1 = client.post(self._url, data=json.dumps(body))
         assert res1.status_code == status.HTTP_200_OK
-
-        body_patch = {
-            "name": db_category.name,
-            "order": 1,
-        }
-        res = client.patch(f"{self._url}{res1.json()['id']}", data=json.dumps(body_patch))
+        res = client.patch(f"{self._url}{res1.json()['id']}", data=json.dumps({"order": 1}))
         assert res.status_code == status.HTTP_200_OK
         assert res.json()["order"] == 1
 
@@ -126,19 +123,21 @@ class TestCategory:
         body = {
             "name": "new",
             "type": "test",
-            "order": 33
         }
         res1 = client.post(self._url, data=json.dumps(body))
-        assert res1.status_code == status.HTTP_400_BAD_REQUEST
+        assert res1.status_code == status.HTTP_200_OK
+        res = client.patch(f"{self._url}{res1.json()['id']}", data=json.dumps({"order": 33}))
+        assert res.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_create_negative_order_fail(self, dbsession, db_category, client):
         body = {
             "name": "new",
             "type": "test",
-            "order": -1
         }
         res1 = client.post(self._url, data=json.dumps(body))
-        assert res1.status_code == status.HTTP_400_BAD_REQUEST
+        assert res1.status_code == status.HTTP_200_OK
+        res = client.patch(f"{self._url}{res1.json()['id']}", data=json.dumps({"order": -1}))
+        assert res.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_delete_order(self, db_category, client, dbsession):
         body = {
@@ -147,9 +146,10 @@ class TestCategory:
         }
         res1 = client.post(self._url, data=json.dumps(body))
         assert res1.status_code == status.HTTP_200_OK
+        assert res1.json()['order'] == 2
 
-        res = client.delete(f"{self._url}{res1.json()['id']}")
+        res = client.delete(f"{self._url}{db_category.id}")
         assert res.status_code == status.HTTP_200_OK
 
-        res = client.get(f"{self._url}{db_category.id}")
-        assert res.json()['order'] == body['order']
+        res = client.get(f"{self._url}{res1.json()['id']}")
+        assert res.json()['order'] == 1

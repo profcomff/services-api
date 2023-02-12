@@ -11,13 +11,12 @@ class TestButton:
     def test_get_success(self, client, db_button):
         res = client.get(self._url)
         assert res.status_code == status.HTTP_200_OK
-        # assert len(res.json()) == 1
+        assert len(res.json()) == 1
         assert res.json()[0]['id'] == db_button.id
 
     def test_post_success(self, client, db_category, dbsession):
         body = {
             "category_id": db_category.id,
-            "order": 1,
             "icon": "https://lh3.googleusercontent.com/yURn6ISxDySTdXZAW2PUcADMnU3y9YX0M1RyXOH8a3sa1Tr0pHhPLGw5BKuiLiXa3Eh0fyHm7Dfsd9FodK3fxJge6g=w640-h400-e365-rj-sc0x00ffffff",
             "name": "string",
             "link": "google.com",
@@ -28,7 +27,7 @@ class TestButton:
         res_body = res.json()
         assert res_body["category_id"] == body["category_id"]
         assert res_body["icon"] == body["icon"]
-        assert res_body["order"] == body["order"]
+        assert res_body["order"] == 1
         assert res_body["name"] == body["name"]
         assert res_body["link"] == body["link"]
         assert res_body["type"] == body["type"]
@@ -42,7 +41,7 @@ class TestButton:
         assert db_button_created.category == db_category
         assert db_button_created.link == body["link"]
         assert db_button_created.type == body["type"]
-        assert db_button_created.order == body["order"]
+        assert db_button_created.order == 1
 
     def test_get_by_id_success(self, client, db_button):
         res = client.get(f'{self._url}{db_button.id}')
@@ -119,7 +118,7 @@ class TestButton:
         res = client.post(self._url, data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
 
-        res = client.patch(self._url, data=json.dumps({"order": 1}))
+        res = client.patch(f'{self._url}{res.json()["id"]}', data=json.dumps({"order": 1}))
         assert res.json()["order"] == 1
         res_old = client.get(f"{self._url}{db_button.id}")
         assert res_old.json()["order"] == 2
@@ -150,8 +149,8 @@ class TestButton:
             "link": "test",
             "type": "test",
         }
-        client.post(self._url, data=json.dumps(body))
-        res1 = client.patch(self._url, data=json.dumps({"order": -10}))
+        res = client.post(self._url, data=json.dumps(body))
+        res1 = client.patch(f"{self._url}{res.json()['id']}", data=json.dumps({"order": -10}))
         assert res1.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_delete_order(self, db_button, client, dbsession):
