@@ -18,17 +18,21 @@ def create_category(category_inp: CategoryCreate):
     return category
 
 
-@category.get("/", response_model=list[CategoryGet])
+@category.get("/", response_model=list[CategoryGet], response_model_exclude_unset=True)
 def get_categories(offset: int = 0, limit: int = 100):
     return db.session.query(Category).order_by(Category.order).offset(offset).limit(limit).all()
 
 
-@category.get("/{category_id}", response_model=CategoryGet)
+@category.get("/{category_id}", response_model=CategoryGet, response_model_exclude_unset=True)
 def get_category(category_id: int):
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
-    return category
+    return {"id": category_id,
+            "order": category.order,
+            "name": category.name,
+            "type": category.type,
+            }
 
 
 @category.delete("/{category_id}", response_model=None)

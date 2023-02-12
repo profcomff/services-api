@@ -22,5 +22,5 @@ app.add_middleware(
     allow_headers=settings.CORS_ALLOW_HEADERS,
 )
 
-app.include_router(button, prefix='/button', tags=["Button"])
+app.include_router(button, prefix='/category/{category_id}/button', tags=["Button"])
 app.include_router(category, prefix='/category', tags=["Category"])
