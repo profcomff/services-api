@@ -103,6 +103,7 @@ class TestCategory:
 
         res_old = client.get(f"{self._url}{db_category.id}")
         assert res_old.json()["order"] == 2
+        client.delete(f"{self._url}{res.json()['id']}")
 
     def test_patch_order(self, client, db_category):
         body = {
@@ -117,6 +118,7 @@ class TestCategory:
 
         res = client.get(f"{self._url}{db_category.id}")
         assert res.json()["order"] == 2
+        client.delete(f"{self._url}{res1.json()['id']}")
 
     def test_create_third_fail(self, db_category, client):
         body = {
@@ -127,6 +129,7 @@ class TestCategory:
         assert res1.status_code == status.HTTP_200_OK
         res = client.patch(f"{self._url}{res1.json()['id']}", data=json.dumps({"order": 33}))
         assert res.status_code == status.HTTP_400_BAD_REQUEST
+        client.delete(f"{self._url}{res1.json()['id']}")
 
     def test_create_negative_order_fail(self, db_category, client):
         body = {
@@ -137,6 +140,7 @@ class TestCategory:
         assert res1.status_code == status.HTTP_200_OK
         res = client.patch(f"{self._url}{res1.json()['id']}", data=json.dumps({"order": -1}))
         assert res.status_code == status.HTTP_400_BAD_REQUEST
+        client.delete(f"{self._url}{res1.json()['id']}")
 
     def test_delete_order(self, db_category, client):
         body = {
