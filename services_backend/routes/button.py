@@ -41,14 +41,7 @@ def get_button(button_id: int, category_id: int):
         raise HTTPException(status_code=404, detail="Button does not exist")
     if button.category_id != category_id:
         raise HTTPException(status_code=404, detail="Button is not this category")
-    return {
-        "id": button_id,
-        "order": button.order,
-        "category": category_id,
-        "name": button.name,
-        "icon": button.icon,
-        "link": button.link,
-        "type": button.type}
+    return button
 
 
 @button.delete("/{button_id}", response_model=None)
