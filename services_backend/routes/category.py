@@ -10,7 +10,7 @@ category = APIRouter()
 @category.post("/", response_model=CategoryGet)
 def create_category(category_inp: CategoryCreate):
     last_category = db.session.query(Category).order_by(Category.order.desc()).first()
-    category = Category(**category_inp.dict())
+    category = Category(**category_inp.dict(exclude_none=True))
     if last_category:
         category.order = last_category.order + 1
     db.session.add(category)
@@ -18,12 +18,14 @@ def create_category(category_inp: CategoryCreate):
     return category
 
 
-@category.get("/", response_model=list[CategoryGet], response_model_exclude_unset=True)
+@category.get("/", response_model=list[CategoryGet])
 def get_categories(offset: int = 0, limit: int = 100):
-    return db.session.query(Category).order_by(Category.order).offset(offset).limit(limit).all()
+    if (offset < 0) or (limit < 0):
+        raise HTTPException(400, detail="Offset or limit cant be negative")
+    return [{"id": category.id, "order": category.order, "name": category.name, "type": category.type} for category in db.session.query(Category).order_by(Category.order).offset(offset).limit(limit).all()]
 
 
-@category.get("/{category_id}", response_model=CategoryGet, response_model_exclude_unset=True)
+@category.get("/{category_id}", response_model=CategoryGet)
 def get_category(category_id: int):
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
@@ -76,7 +78,7 @@ def update_category(category_inp: CategoryUpdate, category_id: int):
             .update({"order": Category.order - 1})
 
     category.update(
-        category_inp.dict(exclude_unset=True)
+        category_inp.dict(exclude_unset=True, exclude_none=True)
     )
     ret = category.one()
     db.session.commit()

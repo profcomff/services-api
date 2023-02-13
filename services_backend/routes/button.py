@@ -14,7 +14,7 @@ def create_button(button_inp: ButtonCreate, category_id: int):
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
     last_button = db.session.query(Button).order_by(Button.order.desc()).first()
-    button = Button(**button_inp.dict())
+    button = Button(**button_inp.dict(exclude_none=True))
     button.category_id = category_id
     if last_button:
         button.order = last_button.order + 1
@@ -48,7 +48,7 @@ def get_button(button_id: int, category_id: int):
         "name": button.name,
         "icon": button.icon,
         "link": button.link,
-        "type": button.type,}
+        "type": button.type}
 
 
 @button.delete("/{button_id}", response_model=None)
@@ -97,7 +97,7 @@ def update_button(button_inp: ButtonUpdate, button_id: int, category_id: int):
             .filter(Button.order > button.one().order) \
             .update({"order": Button.order - 1})
     button.update(
-        button_inp.dict(exclude_unset=True)
+        button_inp.dict(exclude_unset=True, exclude_none=True)
     )
     ret = button.one()
     db.session.commit()
