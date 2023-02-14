@@ -23,7 +23,7 @@ def create_button(button_inp: ButtonCreate, category_id: int):
     return button
 
 
-@button.get("/", response_model=CategoryGet, response_model_exclude_unset=True)
+@button.get("/", response_model=CategoryGet)
 def get_buttons(category_id: int):
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
