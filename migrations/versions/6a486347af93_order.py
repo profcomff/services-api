@@ -23,8 +23,10 @@ def upgrade():
     for i in range(0, len(res)):
         conn.execute(sa.text(f'select order from button where button.id={res[i]} update button set order = {i+1}'))
     op.alter_column('button', 'order', nullable=False)
-    op.add_column('button', sa.Column('link', sa.String(), nullable=False))
-    op.add_column('button', sa.Column('type', sa.String(), nullable=False))
+    op.add_column('button', sa.Column('link', sa.String(), nullable=True))
+    conn.execute(sa.text(f'update button set link=""')
+    op.add_column('button', sa.Column('type', sa.String(), nullable=True))
+    conn.execute(sa.text(f'update button set type=""')
     op.alter_column('button', 'name', existing_type=sa.VARCHAR(), nullable=False)
     op.alter_column('button', 'category_id', existing_type=sa.INTEGER(), nullable=False)
     op.alter_column('button', 'icon', existing_type=sa.VARCHAR(), nullable=False)
