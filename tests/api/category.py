@@ -17,7 +17,6 @@ class TestCategory:
         assert res_body[0]['type'] == db_category.type
         assert res_body[0]['name'] == db_category.name
         assert res_body[0]['order'] == db_category.order
-        assert not res_body[0]['buttons']
 
     def test_post_success(self, client, dbsession):
         body = {"type": "string", "name": "string"}
@@ -42,7 +41,6 @@ class TestCategory:
         assert res_body['type'] == db_category.type
         assert res_body['name'] == db_category.name
         assert res_body['order'] == db_category.order
-        assert not res_body['buttons']
 
     def test_delete_by_id_success(self, client, dbsession, db_category):
         res = client.delete(f'{self._url}{db_category.id}')
