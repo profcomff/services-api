@@ -17,7 +17,7 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('button', sa.Column('order', sa.Integer(), nullable=False))
+    op.add_column('button', sa.Column('order', sa.Integer(), nullable=True))
     op.add_column('button', sa.Column('link', sa.String(), nullable=False))
     op.add_column('button', sa.Column('type', sa.String(), nullable=False))
     op.alter_column('button', 'name', existing_type=sa.VARCHAR(), nullable=False)
@@ -26,6 +26,7 @@ def upgrade():
     op.add_column('category', sa.Column('order', sa.Integer(), nullable=False))
     op.alter_column('category', 'name', existing_type=sa.VARCHAR(), nullable=False)
     op.alter_column('category', 'type', existing_type=sa.VARCHAR(), nullable=False)
+    op.alter_column('button', 'order', nullable=False)
 
 
 def downgrade():
