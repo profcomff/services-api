@@ -8,9 +8,9 @@ class CategoryCreate(Base):
 
 
 class CategoryUpdate(Base):
+    order: int | None
     type: str | None
     name: str | None
-    order: int | None
 
 
 class CategoryGet(Base):
@@ -19,3 +19,4 @@ class CategoryGet(Base):
     type: str | None
     name: str | None
     buttons: list[ButtonGet] | None
+
