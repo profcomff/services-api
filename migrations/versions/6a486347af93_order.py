@@ -18,15 +18,15 @@ depends_on = None
 
 def upgrade():
     op.add_column('button', sa.Column('order', sa.Integer(), nullable=True))
+    op.add_column('button', sa.Column('link', sa.String(), nullable=True))
+    op.add_column('button', sa.Column('type', sa.String(), nullable=True))
     conn = op.get_bind()
     res = conn.execute(sa.text("select id from button")).fetchall()
     for i in range(0, len(res)):
-        conn.execute(sa.text(f'select order from button where button.id={res[i]} update button set order = {i+1}'))
+        conn.execute(sa.text(f'UPDATE button set order = {i+1}, link = "a", type = "b", where id={res[i]}'))
     op.alter_column('button', 'order', nullable=False)
-    op.add_column('button', sa.Column('link', sa.String(), nullable=True))
-    op.execute('update "button" set link=test')
-    op.add_column('button', sa.Column('type', sa.String(), nullable=True))
-    op.execute('update "button" set link=test')
+    op.alter_column('button', 'link', nullable=False)
+    op.alter_column('button', 'type', nullable=False)
     op.alter_column('button', 'name', existing_type=sa.VARCHAR(), nullable=False)
     op.alter_column('button', 'category_id', existing_type=sa.INTEGER(), nullable=False)
     op.alter_column('button', 'icon', existing_type=sa.VARCHAR(), nullable=False)
