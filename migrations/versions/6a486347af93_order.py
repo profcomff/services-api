@@ -19,9 +19,9 @@ depends_on = None
 def upgrade():
     op.add_column('button', sa.Column('order', sa.Integer(), nullable=False))
     conn = op.get_bind()
-    res = conn.execute(sa.text("select name from button")).fetchall()
-    for i in range(1, len(res)):
-        op.execute(f'UPDATE "button" SET order=0')
+    res = conn.execute(sa.text("select id from button")).fetchall()
+    for i in range(0, len(res)):
+        conn.execute(sa.text(f'select order from button where button.id={res[i]} update button set order = {i+1}'))
     op.add_column('button', sa.Column('link', sa.String(), nullable=False))
     op.add_column('button', sa.Column('type', sa.String(), nullable=False))
     op.alter_column('button', 'name', existing_type=sa.VARCHAR(), nullable=False)
