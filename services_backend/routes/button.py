@@ -23,7 +23,7 @@ def create_button(button_inp: ButtonCreate, category_id: int):
     return button
 
 
-@button.get("/", response_model=CategoryGet, response_model_exclude_unset=True)
+@button.get("/", response_model=CategoryGet)
 def get_buttons(category_id: int):
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
@@ -63,7 +63,8 @@ def remove_button(button_id: int, category_id: int):
 
 @button.patch("/{button_id}", response_model=ButtonUpdate)
 def update_button(button_inp: ButtonUpdate, button_id: int, category_id: int):
-    button = db.session.query(Button).filter(Button.category_id == category_id).filter(Button.id == button_id).one_or_none()
+    query = db.session.query(Button).filter(Button.id == button_id)
+    button = query.one_or_none()
     last_button = db.session.query(Button).filter(Button.category_id == category_id).order_by(Button.order.desc()).first()
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
 
@@ -92,7 +93,6 @@ def update_button(button_inp: ButtonUpdate, button_id: int, category_id: int):
                 .filter(Button.order > button.order) \
                 .update({"order": Button.order - 1})
 
-    query = db.session.query(Button).filter(Button.id == button_id)
     query.update(
         button_inp.dict(exclude_unset=True, exclude_none=True)
     )

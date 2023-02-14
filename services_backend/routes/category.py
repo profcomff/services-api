@@ -22,7 +22,7 @@ def create_category(category_inp: CategoryCreate):
 def get_categories(offset: int = 0, limit: int = 100):
     if (offset < 0) or (limit < 0):
         raise HTTPException(400, detail="Offset or limit cant be negative")
-    return [{"id": category.id, "order": category.order, "name": category.name, "type": category.type} for category in db.session.query(Category).order_by(Category.order).offset(offset).limit(limit).all()]
+    return [CategoryGet.from_orm(row).dict(exclude={"buttons"}) for row in db.session.query(Category).order_by(Category.order).offset(offset).limit(limit).all()]
 
 
 @category.get("/{category_id}", response_model=CategoryGet, response_model_exclude_none=True)
