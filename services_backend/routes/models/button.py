@@ -24,4 +24,3 @@ class ButtonGet(Base):
     name: str | None
     link: str | None
     type: str | None
-

@@ -17,7 +17,7 @@ class TestButton:
             "icon": "https://lh3.googleusercontent.com/yURn6ISxDySTdXZAW2PUcADMnU3y9YX0M1RyXOH8a3sa1Tr0pHhPLGw5BKuiLiXa3Eh0fyHm7Dfsd9FodK3fxJge6g=w640-h400-e365-rj-sc0x00ffffff",
             "name": "string",
             "link": "google.com",
-            "type": "test"
+            "type": "test",
         }
         res = client.post(f"/category/{db_category.id}/button/", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
@@ -27,9 +27,7 @@ class TestButton:
         assert res_body["name"] == body["name"]
         assert res_body["link"] == body["link"]
         assert res_body["type"] == body["type"]
-        db_button_created: Button = (
-            dbsession.query(Button).filter(Button.id == res_body["id"]).one_or_none()
-        )
+        db_button_created: Button = dbsession.query(Button).filter(Button.id == res_body["id"]).one_or_none()
         assert db_button_created
         assert db_button_created.icon == body["icon"]
         assert db_button_created.name == body["name"]
@@ -57,8 +55,7 @@ class TestButton:
         assert get_res.status_code == status.HTTP_404_NOT_FOUND
 
     def test_patch_by_id_success(self, db_button, client, db_category):
-        body = {"icon": "cool icon", "name": "nice name", "order": 2,
-                "link": "ya.ru", "type": "nice type"}
+        body = {"icon": "cool icon", "name": "nice name", "order": 2, "link": "ya.ru", "type": "nice type"}
         res = client.patch(f"/category/{db_category.id}/button/{db_button.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
         res_body = res.json()
@@ -77,10 +74,7 @@ class TestButton:
         res = client.patch(f"/category/{db_category.id}/button/{db_button.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
         assert res.json()["icon"] == body["icon"]
-        body_name = {
-            "name": "string",
-            "order": 1
-        }
+        body_name = {"name": "string", "order": 1}
         res = client.patch(f"/category/{db_category.id}/button/{db_button.id}", data=json.dumps(body_name))
         assert res.status_code == status.HTTP_200_OK
         assert res.json()["name"] == body_name["name"]

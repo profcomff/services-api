@@ -67,9 +67,7 @@ class TestCategory:
         res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
         assert res.json()["order"] == body["order"]
-        body_ord = {
-            "order": 1
-        }
+        body_ord = {"order": 1}
         res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body_ord))
         assert res.status_code == status.HTTP_200_OK
         assert res.json()["order"] == body_ord["order"]

@@ -53,11 +53,9 @@ def remove_button(button_id: int, category_id: int):
     if not button:
         raise HTTPException(status_code=404, detail="Button does not exist")
     if button.category_id != category_id:
-        raise HTTPException(status_code=404, detail="Button is not this category")
+        raise HTTPException(status_code=404, detail="Button is not in this category")
     db.session.delete(button)
-    db.session.query(Button) \
-        .filter(Button.order > button.order) \
-        .update({"order": Button.order - 1})
+    db.session.query(Button).filter(Button.order > button.order).update({"order": Button.order - 1})
     db.session.commit()
 
 
@@ -65,7 +63,9 @@ def remove_button(button_id: int, category_id: int):
 def update_button(button_inp: ButtonUpdate, button_id: int, category_id: int):
     query = db.session.query(Button).filter(Button.id == button_id)
     button = query.one_or_none()
-    last_button = db.session.query(Button).filter(Button.category_id == category_id).order_by(Button.order.desc()).first()
+    last_button = (
+        db.session.query(Button).filter(Button.category_id == category_id).order_by(Button.order.desc()).first()
+    )
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
 
     if not category:
@@ -79,22 +79,17 @@ def update_button(button_inp: ButtonUpdate, button_id: int, category_id: int):
 
     if button_inp.order:
         if last_button and (button_inp.order > last_button.order + 1):
-            raise HTTPException(status_code=400, detail=f"Can`t create button with order {button_inp.order}. "
-                                                        f"Last category is {last_button.order}")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Can`t create button with order {button_inp.order}. " f"Last category is {last_button.order}",
+            )
         if button_inp.order < 1:
-            raise HTTPException(status_code=400,
-                                detail="Order can`t be less than 1")
+            raise HTTPException(status_code=400, detail="Order can`t be less than 1")
         if button.order > button_inp.order:
-            db.session.query(Button) \
-                .filter(Button.order < button.order) \
-                .update({"order": Button.order + 1})
+            db.session.query(Button).filter(Button.order < button.order).update({"order": Button.order + 1})
         elif button.order < button_inp.order:
-            db.session.query(Button) \
-                .filter(Button.order > button.order) \
-                .update({"order": Button.order - 1})
+            db.session.query(Button).filter(Button.order > button.order).update({"order": Button.order - 1})
 
-    query.update(
-        button_inp.dict(exclude_unset=True, exclude_none=True)
-    )
+    query.update(button_inp.dict(exclude_unset=True, exclude_none=True))
     db.session.commit()
     return button

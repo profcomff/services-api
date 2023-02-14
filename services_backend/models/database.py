@@ -21,4 +21,3 @@ class Button(Base):
     icon: Mapped[str] = mapped_column(String)
     link: Mapped[str] = mapped_column(String)
     type: Mapped[str] = mapped_column(String)
-
