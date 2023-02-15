@@ -23,11 +23,11 @@ def upgrade():
     conn = op.get_bind()
     res = conn.execute(sa.text("select id from button")).fetchall()
     for i in range(0, len(res)):
-        conn.execute(sa.text(f"""UPDATE "button" 
-                                 SET "button".order={i+1}, 
-                                     "button".link='a', 
-                                     "button".type='b' 
-                                 WHERE "button".id={res[i]}"""))
+        conn.execute(sa.text(f"""UPDATE "button"
+                                 SET "order"={i + 1}, 
+                                     "link"='#', 
+                                     "type"='external' 
+                                 WHERE id={res[i][0]}"""))
     op.alter_column('button', 'order', nullable=False)
     op.alter_column('button', 'link', nullable=False)
     op.alter_column('button', 'type', nullable=False)
