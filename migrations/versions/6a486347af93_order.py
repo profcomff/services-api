@@ -35,10 +35,11 @@ def upgrade():
     op.alter_column('button', 'category_id', existing_type=sa.INTEGER(), nullable=False)
     op.alter_column('button', 'icon', existing_type=sa.VARCHAR(), nullable=False)
     op.add_column('category', sa.Column('order', sa.Integer(), nullable=True))
-    conn = op.get_bind()
     res = conn.execute(sa.text("select id from category")).fetchall()
     for i in range(0, len(res)):
-        conn.execute(sa.text(f'select order from category where category.id={res[i]} update category set order = {i+1}'))
+        conn.execute(sa.text(f"""UPDATE "category"
+                                     SET "order"={i + 1} 
+                                     WHERE id={res[i][0]}"""))
     op.alter_column('category', 'order', nullable=False)
     op.alter_column('category', 'name', existing_type=sa.VARCHAR(), nullable=False)
     op.alter_column('category', 'type', existing_type=sa.VARCHAR(), nullable=False)
