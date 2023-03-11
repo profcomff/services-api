@@ -1,36 +1,61 @@
-from fastapi import HTTPException, APIRouter
+from fastapi import HTTPException, APIRouter, Depends
 from fastapi_sqlalchemy import db
+from sqlalchemy import or_
 
-from .models.category import CategoryCreate, CategoryUpdate, CategoryGet
+from ..settings import get_settings
+from .models.category import CategoryCreate, CategoryGet, CategoryUpdate
 from ..models.database import Category, Button
+
+from auth_lib.fastapi import UnionAuth
 
 category = APIRouter()
 
 
-@category.post("/", response_model=CategoryGet)
-def create_category(category_inp: CategoryCreate):
+@category.post("/", response_model=CategoryGet, response_model_exclude_none=True)
+def create_category(category_inp: CategoryCreate, user: dict[str, str] = Depends(UnionAuth(get_settings().AUTH_URL))):
+    if not user:
+        raise HTTPException(403, detail="Not authenticated")
     last_category = db.session.query(Category).order_by(Category.order.desc()).first()
     category = Category(**category_inp.dict(exclude_none=True))
     if last_category:
         category.order = last_category.order + 1
+    category.user_scope = "services.test.test1"
     db.session.add(category)
     db.session.commit()
     return category
 
 
 @category.get("/", response_model=list[CategoryGet], response_model_exclude_none=True)
-def get_categories(offset: int = 0, limit: int = 100):
+def get_categories(offset: int = 0, limit: int = 100, user: dict[str, str] = Depends(UnionAuth(get_settings().AUTH_URL))):
     if (offset < 0) or (limit < 0):
         raise HTTPException(400, detail="Offset or limit cant be negative")
-    return [
-        CategoryGet.from_orm(row).dict(exclude={"buttons"})
-        for row in db.session.query(Category).order_by(Category.order).offset(offset).limit(limit).all()
-    ]
+    if user:
+        return [
+            CategoryGet.from_orm(row).dict(exclude={"buttons"})
+            for row in db.session.query(Category).order_by(Category.order)
+            .filter(or_(Category.user_scope.in_(user["scopes"]), Category.user_scope == []))
+            .offset(offset).limit(limit).all()
+        ]
+    else:
+        return [
+            CategoryGet.from_orm(row).dict(exclude={"buttons"})
+            for row in db.session.query(Category).order_by(Category.order)
+            .filter(Category.user_scope == []).offset(offset).limit(limit).all()
+        ]
 
 
 @category.get("/{category_id}", response_model=CategoryGet, response_model_exclude_none=True)
-def get_category(category_id: int):
-    category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
+def get_category(category_id: int, user: dict[str, str] = Depends(UnionAuth(get_settings().AUTH_URL))):
+    if user:
+        category = db.session.query(Category) \
+                .filter(or_(Category.user_scope.in_([scope["name"] for scope in user["scopes"]]), Category.user_scope == [])) \
+                .filter(Category.id == category_id) \
+                .one_or_none()
+    else:
+        category = db.session.query(Category) \
+            .filter(Category.user_scope == []) \
+            .filter(Category.id == category_id) \
+            .one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
     return {
@@ -38,11 +63,14 @@ def get_category(category_id: int):
         "order": category.order,
         "name": category.name,
         "type": category.type,
+        "scope": category.user_scope
     }
 
 
 @category.delete("/{category_id}", response_model=None)
-def remove_category(category_id: int):
+def remove_category(category_id: int, user: dict[str, str] = Depends(UnionAuth(get_settings().AUTH_URL))):
+    if not user:
+        raise HTTPException(403, detail="Not authenticated")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -55,7 +83,9 @@ def remove_category(category_id: int):
 
 
 @category.patch("/{category_id}", response_model=CategoryUpdate)
-def update_category(category_inp: CategoryUpdate, category_id: int):
+def update_category(category_inp: CategoryUpdate, category_id: int, user: dict[str, str] = Depends(UnionAuth(get_settings().AUTH_URL))):
+    if not user:
+        raise HTTPException(403, detail="Not authenticated")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     last_category = db.session.query(Category).order_by(Category.order.desc()).first()
 
@@ -71,7 +101,7 @@ def update_category(category_inp: CategoryUpdate, category_id: int):
             raise HTTPException(
                 status_code=400,
                 detail=f"Can`t create category with order {category_inp.order}. "
-                f"Last category is {last_category.order}",
+                       f"Last category is {last_category.order}",
             )
 
         if category.order > category_inp.order:

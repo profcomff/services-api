@@ -11,6 +11,7 @@ class CategoryUpdate(Base):
     order: int | None
     type: str | None
     name: str | None
+    user_scope: list[str] | None
 
 
 class CategoryGet(Base):

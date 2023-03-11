@@ -1,4 +1,4 @@
-from pydantic import BaseSettings, PostgresDsn
+from pydantic import BaseSettings, PostgresDsn, AnyUrl
 from functools import lru_cache
 
 
@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     """Application settings"""
 
     DB_DSN: PostgresDsn
+    AUTH_URL: AnyUrl = "https://auth.api.test.profcomff.com/"
 
     CORS_ALLOW_ORIGINS: list[str] = ['*']
     CORS_ALLOW_CREDENTIALS: bool = True

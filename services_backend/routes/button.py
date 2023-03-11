@@ -1,15 +1,20 @@
-from fastapi import HTTPException, APIRouter
+from fastapi import HTTPException, APIRouter, Depends
 from fastapi_sqlalchemy import db
 
+from ..settings import get_settings
 from .models.button import ButtonCreate, ButtonUpdate, ButtonGet
 from .models.category import CategoryGet
 from ..models.database import Button, Category
+
+from auth_lib.fastapi import UnionAuth
 
 button = APIRouter()
 
 
 @button.post("/", response_model=ButtonGet)
-def create_button(button_inp: ButtonCreate, category_id: int):
+def create_button(button_inp: ButtonCreate, category_id: int, user: dict[str, str] = Depends(UnionAuth(get_settings().AUTH_URL))):
+    if not user:
+        raise HTTPException(403, detail="Not authenticated")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -24,16 +29,34 @@ def create_button(button_inp: ButtonCreate, category_id: int):
 
 
 @button.get("/", response_model=CategoryGet)
-def get_buttons(category_id: int):
-    category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
+def get_buttons(category_id: int, user: dict[str, str] = Depends(UnionAuth(get_settings().AUTH_URL))):
+    if user:
+        category = db.session.query(Category) \
+            .filter(Category.user_scope.in_(user["scopes"]) or Category.user_scope == []) \
+            .filter(Category.id == category_id) \
+            .one_or_none()
+    else:
+        category = db.session.query(Category) \
+            .filter(Category.user_scope == []) \
+            .filter(Category.id == category_id) \
+            .one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
     return category
 
 
 @button.get("/{button_id}", response_model=ButtonGet)
-def get_button(button_id: int, category_id: int):
-    category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
+def get_button(button_id: int, category_id: int, user: dict[str, str] = Depends(UnionAuth(get_settings().AUTH_URL))):
+    if user:
+        category = db.session.query(Category) \
+            .filter(Category.user_scope.in_(user["scopes"]) or Category.user_scope == []) \
+            .filter(Category.id == category_id) \
+            .one_or_none()
+    else:
+        category = db.session.query(Category) \
+            .filter(Category.user_scope == []) \
+            .filter(Category.id == category_id) \
+            .one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
     button = db.session.query(Button).filter(Button.id == button_id).one_or_none()
@@ -45,7 +68,9 @@ def get_button(button_id: int, category_id: int):
 
 
 @button.delete("/{button_id}", response_model=None)
-def remove_button(button_id: int, category_id: int):
+def remove_button(button_id: int, category_id: int, user: dict[str, str] = Depends(UnionAuth(get_settings().AUTH_URL))):
+    if not user:
+        raise HTTPException(403, detail="Not authenticated")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -60,7 +85,9 @@ def remove_button(button_id: int, category_id: int):
 
 
 @button.patch("/{button_id}", response_model=ButtonUpdate)
-def update_button(button_inp: ButtonUpdate, button_id: int, category_id: int):
+def update_button(button_inp: ButtonUpdate, button_id: int, category_id: int, user: dict[str, str] = Depends(UnionAuth(get_settings().AUTH_URL))):
+    if not user:
+        raise HTTPException(403, detail="Not authenticated")
     query = db.session.query(Button).filter(Button.id == button_id)
     button = query.one_or_none()
     last_button = (
