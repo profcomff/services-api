@@ -81,7 +81,6 @@ jobs:
           docker stop ${{ env.CONTAITER_NAME }} || true && docker rm ${{ env.CONTAITER_NAME }} || true
           docker run \
             --detach \
-            --build-arg CONF_FILE=logging_test.conf
             --restart on-failure:3 \
             --network=web \
             --env DB_DSN=${{ secrets.DB_DSN }} \
