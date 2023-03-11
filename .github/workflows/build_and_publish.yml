@@ -83,7 +83,8 @@ jobs:
             --detach \
             --restart on-failure:3 \
             --network=web \
-            --env DB_DSN=${{ secrets.DB_DSN }} \
+            --env DB_DSN='${{ secrets.DB_DSN }}' \
+            --env GUNICORN_CMD_ARGS='--log-config  logging_test.conf' \
             --name ${{ env.CONTAITER_NAME }} \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
 
@@ -124,5 +125,6 @@ jobs:
             --restart always \
             --network=web \
             --env DB_DSN='${{ secrets.DB_DSN }}' \
+            --env GUNICORN_CMD_ARGS='--log-config  logging_prod.conf' \
             --name ${{ env.CONTAITER_NAME }} \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
