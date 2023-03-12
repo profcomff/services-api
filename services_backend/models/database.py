@@ -4,21 +4,20 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from .base import Base
 
 
-class Scope(Base):
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    read_scope: Mapped[str] = mapped_column(String, nullable=False)
-    category_id: Mapped[int] = mapped_column(Integer, ForeignKey(Category.id))
-    category: Mapped[list[Category]] = relationship("Category", back_populates="Category.read_scope", foreign_keys=category_id)
-
-
 class Category(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     order: Mapped[int] = mapped_column(Integer, default=1)
     name: Mapped[str] = mapped_column(String)
     type: Mapped[str] = mapped_column(String)
-    read_scope: Mapped[str] = mapped_column(String, ForeignKey(Scope.read_scope))
     buttons: Mapped[list[Button]] = relationship("Button", back_populates="category", foreign_keys="Button.category_id")
-    scopes: Mapped[list[Scope]] = relationship("scopes", back_populates="category", foreign_keys=read_scope)
+    scope: Mapped[list[Scope]] = relationship("scope", back_populates="category")
+
+
+class Scope(Base):
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    read_scope: Mapped[str] = mapped_column(String, nullable=True)
+    category_id: Mapped[int] = mapped_column(Integer, ForeignKey("category.id"))
+    category: Mapped[Category] = relationship("category", back_populates="scope", foreign_keys=[category_id])
 
 
 class Button(Base):
@@ -26,7 +25,7 @@ class Button(Base):
     name: Mapped[str] = mapped_column(String)
     order: Mapped[int] = mapped_column(Integer, default=1)
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey(Category.id))
-    category: Mapped[Category] = relationship("Category", back_populates="buttons", foreign_keys=[category_id])
+    category: Mapped[Category] = relationship("category", back_populates="buttons", foreign_keys=[category_id])
     icon: Mapped[str] = mapped_column(String)
     link: Mapped[str] = mapped_column(String)
     type: Mapped[str] = mapped_column(String)

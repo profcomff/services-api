@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from services_backend.settings import Settings
 from .button import button
 from .category import category
+from .scopes import scope
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_sqlalchemy import DBSessionMiddleware
 
@@ -22,3 +23,4 @@ app.add_middleware(
 
 app.include_router(button, prefix='/category/{category_id}/button', tags=["Button"])
 app.include_router(category, prefix='/category', tags=["Category"])
+app.include_router(scope, prefix='/scope', tags=["Scope"])
