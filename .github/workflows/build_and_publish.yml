@@ -86,6 +86,7 @@ jobs:
             --restart on-failure:3 \
             --network=web \
             --env DB_DSN='${{ secrets.DB_DSN }}' \
+            --env ROOT_PATH='/services' \
             --env GUNICORN_CMD_ARGS='--log-config  logging_test.conf' \
             --name ${{ env.CONTAITER_NAME }} \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
@@ -113,6 +114,7 @@ jobs:
             --rm \
             --network=web \
             --env DB_DSN=${{ secrets.DB_DSN }} \
+            --env ROOT_PATH='/services' \
             --name ${{ env.CONTAITER_NAME }}_migration \
             --workdir="/" \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
