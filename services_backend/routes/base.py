@@ -1,13 +1,25 @@
 from fastapi import FastAPI
-
-from services_backend.settings import Settings
-from .button import button
-from .category import category
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_sqlalchemy import DBSessionMiddleware
 
-settings = Settings()
-app = FastAPI()
+from services_backend import __version__
+from services_backend.settings import get_settings
+
+from .button import button
+from .category import category
+
+
+settings = get_settings()
+app = FastAPI(
+    title='API управления списком сервисов',
+    description='Программный интерфейс управления списком сервисов в приложении Твой ФФ!',
+    version=__version__,
+
+    # Настраиваем интернет документацию
+    root_path=settings.ROOT_PATH if __version__ != 'dev' else '/',
+    docs_url=None if __version__ != 'dev' else '/docs',
+    redoc_url=None,
+)
 
 
 app.add_middleware(DBSessionMiddleware, db_url=settings.DB_DSN, engine_args={"pool_pre_ping": True})

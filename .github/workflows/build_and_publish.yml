@@ -47,6 +47,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APP_VERSION=${{ github.ref_name }}
 
   deploy-testing:
     name: Deploy Testing
@@ -54,7 +56,7 @@ jobs:
     runs-on: [self-hosted, Linux]
     environment:
       name: Testing
-      url: https://services.api.test.profcomff.com/
+      url: https://api.test.profcomff.com/services
     env:
       CONTAITER_NAME: com_profcomff_api_services_test
     permissions:
@@ -95,7 +97,7 @@ jobs:
     runs-on: [self-hosted, Linux]
     environment:
       name: Production
-      url: https://services.api.profcomff.com/
+      url: https://api.profcomff.com/services
     env:
       CONTAITER_NAME: com_profcomff_api_services
     permissions:
