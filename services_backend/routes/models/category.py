@@ -1,5 +1,6 @@
 from .base import Base
 from .button import ButtonGet
+from .scope import ScopeGet
 
 
 class CategoryCreate(Base):
@@ -20,3 +21,4 @@ class CategoryGet(Base):
     type: str | None
     name: str | None
     buttons: list[ButtonGet] | None
+    scopes: list[ScopeGet] | None

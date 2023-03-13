@@ -10,14 +10,7 @@ class Category(Base):
     name: Mapped[str] = mapped_column(String)
     type: Mapped[str] = mapped_column(String)
     buttons: Mapped[list[Button]] = relationship("Button", back_populates="category", foreign_keys="Button.category_id")
-    scope: Mapped[list[Scope]] = relationship("scope", back_populates="category")
-
-
-class Scope(Base):
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    read_scope: Mapped[str] = mapped_column(String, nullable=True)
-    category_id: Mapped[int] = mapped_column(Integer, ForeignKey("category.id"))
-    category: Mapped[Category] = relationship("category", back_populates="scope", foreign_keys=[category_id])
+    scopes: Mapped[list[Scope]] = relationship("Scope", back_populates="category")
 
 
 class Button(Base):
@@ -25,7 +18,15 @@ class Button(Base):
     name: Mapped[str] = mapped_column(String)
     order: Mapped[int] = mapped_column(Integer, default=1)
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey(Category.id))
-    category: Mapped[Category] = relationship("category", back_populates="buttons", foreign_keys=[category_id])
+    category: Mapped[Category] = relationship("Category", back_populates="buttons", foreign_keys=[category_id])
     icon: Mapped[str] = mapped_column(String)
     link: Mapped[str] = mapped_column(String)
     type: Mapped[str] = mapped_column(String)
+
+
+class Scope(Base):
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    read_scope: Mapped[str] = mapped_column(String, nullable=True)
+    category_id: Mapped[int] = mapped_column(Integer, ForeignKey("category.id"))
+    category: Mapped[Category] = relationship("Category", back_populates="scopes", foreign_keys=[category_id])
+    

@@ -3,6 +3,7 @@ from .base import Base
 
 class ScopeCreate(Base):
     read_scope: str | None
+    category_id: int | None
 
 
 class ScopeGet(Base):

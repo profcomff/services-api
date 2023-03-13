@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     """Application settings"""
 
     DB_DSN: PostgresDsn
-    AUTH_URL: AnyUrl = "https://auth.api.test.profcomff.com/"
+    AUTH_URL: AnyUrl = "https://api.test.profcomff.com/auth"
 
     CORS_ALLOW_ORIGINS: list[str] = ['*']
     CORS_ALLOW_CREDENTIALS: bool = True
