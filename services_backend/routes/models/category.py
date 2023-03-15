@@ -6,13 +6,14 @@ from .scope import ScopeGet
 class CategoryCreate(Base):
     type: str | None
     name: str | None
+    scopes: list[str] | None
 
 
 class CategoryUpdate(Base):
     order: int | None
     type: str | None
     name: str | None
-    user_scope: list[str] | None
+    scopes: list[str] | None
 
 
 class CategoryGet(Base):
