@@ -1,3 +1,5 @@
+import logging
+
 from auth_lib.fastapi import UnionAuth
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_sqlalchemy import db
@@ -7,6 +9,7 @@ from .models.button import ButtonCreate, ButtonGet, ButtonUpdate
 from .models.category import CategoryGet
 
 
+logger = logging.getLogger(__name__)
 button = APIRouter()
 
 
@@ -16,6 +19,11 @@ def create_button(
     category_id: int,
     user=Depends(UnionAuth(['services.button.create'])),
 ):
+    """Создать кнопку
+
+    Необходимые scopes: `services.button.create`
+    """
+    logger.info(f"User {user} triggered create_button")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -30,7 +38,15 @@ def create_button(
 
 
 @button.get("/", response_model=CategoryGet)
-def get_buttons(category_id: int):
+def get_buttons(
+    category_id: int,
+    user=Depends(UnionAuth(allow_none=True, auto_error=False)),
+):
+    """Показать все кнопки в категории
+
+    Необходимые scopes: `-`
+    """
+    logger.info(f"User {user} triggered create_category")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -38,7 +54,16 @@ def get_buttons(category_id: int):
 
 
 @button.get("/{button_id}", response_model=ButtonGet)
-def get_button(button_id: int, category_id: int):
+def get_button(
+    button_id: int,
+    category_id: int,
+    user=Depends(UnionAuth(allow_none=True, auto_error=False)),
+):
+    """Показать одну кнопку
+
+    Необходимые scopes: `-`
+    """
+    logger.info(f"User {user} triggered create_category")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -56,6 +81,11 @@ def remove_button(
     category_id: int,
     user=Depends(UnionAuth(['services.button.remove'])),
 ):
+    """Удалить кнопку
+
+    Необходимые scopes: `services.button.remove`
+    """
+    logger.info(f"User {user} triggered create_category")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -76,6 +106,11 @@ def update_button(
     category_id: int,
     user=Depends(UnionAuth(['services.button.update'])),
 ):
+    """Обновить кнопку
+
+    Необходимые scopes: `services.button.update`
+    """
+    logger.info(f"User {user} triggered create_category")
     query = db.session.query(Button).filter(Button.id == button_id)
     button = query.one_or_none()
     last_button = (
