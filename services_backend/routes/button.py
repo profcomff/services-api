@@ -46,7 +46,8 @@ def get_buttons(
 
     Необходимые scopes: `-`
     """
-    logger.info(f"User {user.get('id')} triggered create_category")
+    user_id = user.get('id') if user is not None else None
+    logger.info(f"User {user_id} triggered get_buttons")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -63,7 +64,8 @@ def get_button(
 
     Необходимые scopes: `-`
     """
-    logger.info(f"User {user.get('id')} triggered create_category")
+    user_id = user.get('id') if user is not None else None
+    logger.info(f"User {user_id} triggered get_button")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
