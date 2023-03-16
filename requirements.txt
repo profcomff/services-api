@@ -7,3 +7,6 @@ alembic
 SQLAlchemy
 gunicorn
 logging-profcomff
+autoflake
+isort
+black

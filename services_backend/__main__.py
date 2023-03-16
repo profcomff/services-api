@@ -1,5 +1,6 @@
-from .routes.base import app
 import uvicorn
+
+from .routes.base import app
 
 
 if __name__ == '__main__':

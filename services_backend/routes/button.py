@@ -1,9 +1,10 @@
-from fastapi import HTTPException, APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi_sqlalchemy import db
 
-from .models.button import ButtonCreate, ButtonUpdate, ButtonGet
-from .models.category import CategoryGet
 from ..models.database import Button, Category
+from .models.button import ButtonCreate, ButtonGet, ButtonUpdate
+from .models.category import CategoryGet
+
 
 button = APIRouter()
 
