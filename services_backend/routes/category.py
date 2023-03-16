@@ -41,10 +41,12 @@ def get_categories(
 
     Необходимые scopes: `-`
     """
-    if user is None:
+    user_id = user.get('id') if user is not None else None
+    if user_id is None:
         logger.info("Unauthorised user triggered get_categories")
     else:
-        logger.info(f"User {user.get('id')} triggered get_categories")
+        logger.info(f"User {user_id} triggered get_categories")
+
     return [
         CategoryGet.from_orm(row).dict(exclude={"buttons"} if 'buttons' not in info else {})
         for row in db.session.query(Category).order_by(Category.order).all()
@@ -60,10 +62,12 @@ def get_category(
 
     Необходимые scopes: `-`
     """
-    if user is None:
+    user_id = user.get('id') if user is not None else None
+    if user_id is None:
         logger.info("Unauthorised user triggered get_category")
     else:
-        logger.info(f"User {user.get('id')} triggered get_category")
+        logger.info(f"User {user_id} triggered get_category")
+        
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -85,7 +89,8 @@ def remove_category(
 
     Необходимые scopes: `services.category.delete`
     """
-    logger.info(f"User {user.get('id')} triggered remove_category")
+    user_id = user.get('id') if user is not None else None
+    logger.info(f"User {user_id} triggered remove_category")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
