@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException
+from auth_lib.fastapi import UnionAuth
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi_sqlalchemy import db
 
 from ..models.database import Button, Category
@@ -9,7 +10,10 @@ category = APIRouter()
 
 
 @category.post("/", response_model=CategoryGet)
-def create_category(category_inp: CategoryCreate):
+def create_category(
+    category_inp: CategoryCreate,
+    user=Depends(UnionAuth(['services.category.create'])),
+):
     last_category = db.session.query(Category).order_by(Category.order.desc()).first()
     category = Category(**category_inp.dict(exclude_none=True))
     if last_category:
@@ -43,7 +47,10 @@ def get_category(category_id: int):
 
 
 @category.delete("/{category_id}", response_model=None)
-def remove_category(category_id: int):
+def remove_category(
+    category_id: int,
+    user=Depends(UnionAuth(['services.category.delete'])),
+):
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -56,7 +63,11 @@ def remove_category(category_id: int):
 
 
 @category.patch("/{category_id}", response_model=CategoryUpdate)
-def update_category(category_inp: CategoryUpdate, category_id: int):
+def update_category(
+    category_inp: CategoryUpdate,
+    category_id: int,
+    user=Depends(UnionAuth(['services.category.update'])),
+):
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     last_category = db.session.query(Category).order_by(Category.order.desc()).first()
 

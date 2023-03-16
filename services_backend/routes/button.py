@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException
+from auth_lib.fastapi import UnionAuth
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi_sqlalchemy import db
 
 from ..models.database import Button, Category
@@ -10,7 +11,11 @@ button = APIRouter()
 
 
 @button.post("/", response_model=ButtonGet)
-def create_button(button_inp: ButtonCreate, category_id: int):
+def create_button(
+    button_inp: ButtonCreate,
+    category_id: int,
+    user=Depends(UnionAuth(['services.button.create'])),
+):
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -46,7 +51,11 @@ def get_button(button_id: int, category_id: int):
 
 
 @button.delete("/{button_id}", response_model=None)
-def remove_button(button_id: int, category_id: int):
+def remove_button(
+    button_id: int,
+    category_id: int,
+    user=Depends(UnionAuth(['services.button.remove'])),
+):
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -61,7 +70,12 @@ def remove_button(button_id: int, category_id: int):
 
 
 @button.patch("/{button_id}", response_model=ButtonUpdate)
-def update_button(button_inp: ButtonUpdate, button_id: int, category_id: int):
+def update_button(
+    button_inp: ButtonUpdate,
+    button_id: int,
+    category_id: int,
+    user=Depends(UnionAuth(['services.button.update'])),
+):
     query = db.session.query(Button).filter(Button.id == button_id)
     button = query.one_or_none()
     last_button = (
