@@ -7,3 +7,4 @@ alembic
 SQLAlchemy
 gunicorn
 logging-profcomff
+auth-lib-profcomff[fastapi]

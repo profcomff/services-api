@@ -1,14 +1,28 @@
-from fastapi import HTTPException, APIRouter
+import logging
+from typing import Literal
+
+from auth_lib.fastapi import UnionAuth
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_sqlalchemy import db
 
-from .models.category import CategoryCreate, CategoryUpdate, CategoryGet
-from ..models.database import Category, Button
+from ..models.database import Button, Category
+from .models.category import CategoryCreate, CategoryGet, CategoryUpdate
 
+
+logger = logging.getLogger(__name__)
 category = APIRouter()
 
 
 @category.post("/", response_model=CategoryGet)
-def create_category(category_inp: CategoryCreate):
+def create_category(
+    category_inp: CategoryCreate,
+    user=Depends(UnionAuth(['services.category.create'])),
+):
+    """Создает категорию
+
+    Необходимые scopes: `services.category.create`
+    """
+    logger.info(f"User {user.get('id')} triggered create_category")
     last_category = db.session.query(Category).order_by(Category.order.desc()).first()
     category = Category(**category_inp.dict(exclude_none=True))
     if last_category:
@@ -19,17 +33,31 @@ def create_category(category_inp: CategoryCreate):
 
 
 @category.get("/", response_model=list[CategoryGet], response_model_exclude_none=True)
-def get_categories(offset: int = 0, limit: int = 100):
-    if (offset < 0) or (limit < 0):
-        raise HTTPException(400, detail="Offset or limit cant be negative")
+def get_categories(
+    info: list[Literal['buttons']] = Query([]),
+    user=Depends(UnionAuth(allow_none=True, auto_error=False)),
+):
+    """Показывает список категорий
+
+    Необходимые scopes: `-`
+    """
+    logger.info(f"User {user.get('id')} triggered get_categories")
     return [
-        CategoryGet.from_orm(row).dict(exclude={"buttons"})
-        for row in db.session.query(Category).order_by(Category.order).offset(offset).limit(limit).all()
+        CategoryGet.from_orm(row).dict(exclude={"buttons"} if 'buttons' not in info else {})
+        for row in db.session.query(Category).order_by(Category.order).all()
     ]
 
 
 @category.get("/{category_id}", response_model=CategoryGet, response_model_exclude_none=True)
-def get_category(category_id: int):
+def get_category(
+    category_id: int,
+    user=Depends(UnionAuth(allow_none=True, auto_error=False)),
+):
+    """Показывает категорию
+
+    Необходимые scopes: `-`
+    """
+    logger.info(f"User {user.get('id')} triggered get_category")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -42,7 +70,15 @@ def get_category(category_id: int):
 
 
 @category.delete("/{category_id}", response_model=None)
-def remove_category(category_id: int):
+def remove_category(
+    category_id: int,
+    user=Depends(UnionAuth(['services.category.delete'])),
+):
+    """Удаляет категорию и все кнопки в ней
+
+    Необходимые scopes: `services.category.delete`
+    """
+    logger.info(f"User {user.get('id')} triggered remove_category")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -55,7 +91,16 @@ def remove_category(category_id: int):
 
 
 @category.patch("/{category_id}", response_model=CategoryUpdate)
-def update_category(category_inp: CategoryUpdate, category_id: int):
+def update_category(
+    category_inp: CategoryUpdate,
+    category_id: int,
+    user=Depends(UnionAuth(['services.category.update'])),
+):
+    """Обновляет категорию
+
+    Необходимые scopes: `services.category.update`
+    """
+    logger.info(f"User {user.get('id')} triggered update_category")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     last_category = db.session.query(Category).order_by(Category.order.desc()).first()
 

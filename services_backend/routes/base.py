@@ -14,7 +14,6 @@ app = FastAPI(
     title='API управления списком сервисов',
     description='Программный интерфейс управления списком сервисов в приложении Твой ФФ!',
     version=__version__,
-
     # Настраиваем интернет документацию
     root_path=settings.ROOT_PATH if __version__ != 'dev' else '/',
     docs_url=None if __version__ != 'dev' else '/docs',
