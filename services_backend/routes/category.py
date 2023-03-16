@@ -22,7 +22,7 @@ def create_category(
 
     Необходимые scopes: `services.category.create`
     """
-    logger.info(f"User {user} triggered create_category")
+    logger.info(f"User {user.get('id')} triggered create_category")
     last_category = db.session.query(Category).order_by(Category.order.desc()).first()
     category = Category(**category_inp.dict(exclude_none=True))
     if last_category:
@@ -41,7 +41,7 @@ def get_categories(
 
     Необходимые scopes: `-`
     """
-    logger.info(f"User {user} triggered get_categories")
+    logger.info(f"User {user.get('id')} triggered get_categories")
     return [
         CategoryGet.from_orm(row).dict(exclude={"buttons"} if 'buttons' not in info else {})
         for row in db.session.query(Category).order_by(Category.order).all()
@@ -57,7 +57,7 @@ def get_category(
 
     Необходимые scopes: `-`
     """
-    logger.info(f"User {user} triggered get_category")
+    logger.info(f"User {user.get('id')} triggered get_category")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -78,7 +78,7 @@ def remove_category(
 
     Необходимые scopes: `services.category.delete`
     """
-    logger.info(f"User {user} triggered remove_category")
+    logger.info(f"User {user.get('id')} triggered remove_category")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -100,7 +100,7 @@ def update_category(
 
     Необходимые scopes: `services.category.update`
     """
-    logger.info(f"User {user} triggered update_category")
+    logger.info(f"User {user.get('id')} triggered update_category")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     last_category = db.session.query(Category).order_by(Category.order.desc()).first()
 

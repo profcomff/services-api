@@ -23,7 +23,7 @@ def create_button(
 
     Необходимые scopes: `services.button.create`
     """
-    logger.info(f"User {user} triggered create_button")
+    logger.info(f"User {user.get('id')} triggered create_button")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -46,7 +46,7 @@ def get_buttons(
 
     Необходимые scopes: `-`
     """
-    logger.info(f"User {user} triggered create_category")
+    logger.info(f"User {user.get('id')} triggered create_category")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -63,7 +63,7 @@ def get_button(
 
     Необходимые scopes: `-`
     """
-    logger.info(f"User {user} triggered create_category")
+    logger.info(f"User {user.get('id')} triggered create_category")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -85,7 +85,7 @@ def remove_button(
 
     Необходимые scopes: `services.button.remove`
     """
-    logger.info(f"User {user} triggered create_category")
+    logger.info(f"User {user.get('id')} triggered create_category")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
@@ -110,7 +110,7 @@ def update_button(
 
     Необходимые scopes: `services.button.update`
     """
-    logger.info(f"User {user} triggered create_category")
+    logger.info(f"User {user.get('id')} triggered create_category")
     query = db.session.query(Button).filter(Button.id == button_id)
     button = query.one_or_none()
     last_button = (
