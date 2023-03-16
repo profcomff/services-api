@@ -12,6 +12,7 @@ class Category(Base):
     name: Mapped[str] = mapped_column(String)
     type: Mapped[str] = mapped_column(String)
     buttons: Mapped[list[Button]] = relationship("Button", back_populates="category", foreign_keys="Button.category_id")
+    scopes: Mapped[list[Scope]] = relationship("Scope", back_populates="category")
 
 
 class Button(Base):
@@ -23,3 +24,10 @@ class Button(Base):
     icon: Mapped[str] = mapped_column(String)
     link: Mapped[str] = mapped_column(String)
     type: Mapped[str] = mapped_column(String)
+
+
+class Scope(Base):
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String, nullable=True)
+    category_id: Mapped[int] = mapped_column(Integer, ForeignKey("category.id"))
+    category: Mapped[Category] = relationship("Category", back_populates="scopes", foreign_keys=[category_id])
