@@ -4,10 +4,10 @@ from typing import Literal
 from auth_lib.fastapi import UnionAuth
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_sqlalchemy import db
+from sqlalchemy import or_
 
 from ..models.database import Button, Category, Scope
 from .models.category import CategoryCreate, CategoryGet, CategoryUpdate
-
 
 logger = logging.getLogger(__name__)
 category = APIRouter()
@@ -15,8 +15,8 @@ category = APIRouter()
 
 @category.post("/", response_model=CategoryGet)
 def create_category(
-    category_inp: CategoryCreate,
-    user=Depends(UnionAuth(['services.category.create'])),
+        category_inp: CategoryCreate,
+        user=Depends(UnionAuth(['services.category.create'])),
 ):
     """Создает категорию
 
@@ -34,8 +34,8 @@ def create_category(
 
 @category.get("/", response_model=list[CategoryGet], response_model_exclude_none=True)
 def get_categories(
-    info: list[Literal['buttons']] = Query([]),
-    user=Depends(UnionAuth(allow_none=True, auto_error=False)),
+        info: list[Literal['buttons']] = Query([]),
+        user=Depends(UnionAuth(allow_none=True, auto_error=False)),
 ):
     """Показывает список категорий
 
@@ -47,16 +47,18 @@ def get_categories(
     else:
         logger.info(f"User {user_id} triggered get_categories")
 
+    user_scopes = [scope["name"] for scope in user["session_scopes"]] if user else []
+
     return [
         CategoryGet.from_orm(row).dict(exclude={"buttons"} if 'buttons' not in info else {})
-        for row in db.session.query(Category).order_by(Category.order).all()
+        for row in list(filter(None, [categ if (set(user_scopes).intersection([scope.__dict__["name"] for scope in categ.scopes]) or (categ.scopes == [])) else None for categ in db.session.query(Category).all()]))
     ]
 
 
 @category.get("/{category_id}", response_model=CategoryGet, response_model_exclude_none=True)
 def get_category(
-    category_id: int,
-    user=Depends(UnionAuth(allow_none=True, auto_error=False)),
+        category_id: int,
+        user=Depends(UnionAuth(allow_none=True, auto_error=False)),
 ):
     """Показывает категорию
 
@@ -67,23 +69,26 @@ def get_category(
         logger.info("Unauthorised user triggered get_category")
     else:
         logger.info(f"User {user_id} triggered get_category")
-        
-    category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
+
+    user_scopes = [scope["name"] for scope in user["session_scopes"]] if user else []
+
+    categories = list(filter(None, [categ if (set(user_scopes).intersection([scope.__dict__["name"] for scope in categ.scopes]) or (categ.scopes == [])) else None for categ in db.session.query(Category).all()]))
+    category = list(filter(None, [category if category.id == category_id else None for category in categories]))
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
     return {
         "id": category_id,
-        "order": category.order,
-        "name": category.name,
-        "type": category.type,
-        "scopes": category.scopes
+        "order": category[0].order,
+        "name": category[0].name,
+        "type": category[0].type,
+        "scopes": category[0].scopes
     }
 
 
 @category.delete("/{category_id}", response_model=None)
 def remove_category(
-    category_id: int,
-    user=Depends(UnionAuth(['services.category.delete'])),
+        category_id: int,
+        user=Depends(UnionAuth(['services.category.delete'])),
 ):
     """Удаляет категорию и все кнопки в ней
 
@@ -104,9 +109,9 @@ def remove_category(
 
 @category.patch("/{category_id}", response_model=CategoryUpdate)
 def update_category(
-    category_inp: CategoryUpdate,
-    category_id: int,
-    user=Depends(UnionAuth(['services.category.update'])),
+        category_inp: CategoryUpdate,
+        category_id: int,
+        user=Depends(UnionAuth(['services.category.update'])),
 ):
     """Обновляет категорию
 
@@ -128,7 +133,7 @@ def update_category(
             raise HTTPException(
                 status_code=400,
                 detail=f"Can`t create category with order {category_inp.order}. "
-                f"Last category is {last_category.order}",
+                       f"Last category is {last_category.order}",
             )
 
         if category.order > category_inp.order:
