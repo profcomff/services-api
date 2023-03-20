@@ -59,7 +59,7 @@ def get_categories(
             filter(
                 None,
                 [
-                    categ if (set(user_scopes).intersection(category_scopes) or (categ.scopes == [])) else None
+                    categ if (set(user_scopes).intersection(category_scopes) or (categ.scopes == None)) else None
                     for categ in categories
                 ],
             )
@@ -91,7 +91,7 @@ def get_category(
                 categ
                 if (
                     set(user_scopes).intersection([scope.__dict__["name"] for scope in categ.scopes])
-                    or (categ.scopes == [])
+                    or (categ.scopes == None)
                 )
                 else None
                 for categ in db.session.query(Category).all()
