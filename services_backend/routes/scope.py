@@ -21,14 +21,6 @@ def get_scopes(category_id: int, offset: int = 0, limit: int = 100):
     return db.session.query(Scope).filter(category_id == Scope.category_id).offset(offset).limit(limit).all()
 
 
-@scope.get("/{scope_id}", response_model=ScopeGet)
-def get_scope(category_id: int, scope_id: int):
-    scope = db.session.query(Scope).filter(category_id == Scope.category_id).filter(Scope.id == scope_id).one_or_none()
-    if not scope:
-        raise HTTPException(status_code=404, detail="Scope does not exist")
-    return scope
-
-
 @scope.delete("/{scope_id}", response_model=None)
 def delete_scope(category_id: int, scope_id: int, user=Depends(UnionAuth(['services.scope.delete']))):
     scope = db.session.query(Scope).filter(category_id == Scope.category_id).filter(Scope.id == scope_id).one_or_none()
