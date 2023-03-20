@@ -4,7 +4,7 @@ from typing import Literal
 from auth_lib.fastapi import UnionAuth
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_sqlalchemy import db
-from sqlalchemy import or_
+from sqlalchemy.orm import joinedload
 
 from ..models.database import Button, Category, Scope
 from .models.category import CategoryCreate, CategoryGet, CategoryUpdate
@@ -47,11 +47,11 @@ def get_categories(
     else:
         logger.info(f"User {user_id} triggered get_categories")
 
-    user_scopes = [scope["name"] for scope in user["session_scopes"]] if user else []
+    user_scopes = set([scope["name"] for scope in user["session_scopes"]] if user else [])
     filtered_categories = []
-    for category in db.session.query(Category).order_by(Category.order).all():
-        category_scopes = [scope.__dict__["name"] for scope in category.scopes]
-        if (category_scopes == []) or (set(user_scopes) & set(category_scopes)):
+    for category in db.session.query(Category).order_by(Category.order).options(joinedload(Category.scopes)).all():
+        category_scopes = set([scope.__dict__["name"] for scope in category.scopes])
+        if (category_scopes == set()) or (user_scopes & category_scopes):
             filtered_categories.append(category)
 
     return [
@@ -75,10 +75,10 @@ def get_category(
     else:
         logger.info(f"User {user_id} triggered get_category")
 
-    user_scopes = [scope["name"] for scope in user["session_scopes"]] if user else []
+    user_scopes = set([scope["name"] for scope in user["session_scopes"]] if user else [])
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category or (
-        category.scopes and not (set(user_scopes) & set([scope.__dict__["name"] for scope in category.scopes]))
+        category.scopes and not (user_scopes & set([scope.__dict__["name"] for scope in category.scopes]))
     ):
         raise HTTPException(status_code=404, detail="Category does not exist")
     return {
