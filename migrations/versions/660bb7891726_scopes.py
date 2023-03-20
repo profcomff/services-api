@@ -17,12 +17,16 @@ depends_on = None
 
 
 def upgrade():
-    op.create_table('scope',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(), nullable=True),
-    sa.Column('category_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['category_id'], ['category.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    op.create_table(
+        'scope',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('name', sa.String(), nullable=True),
+        sa.Column('category_id', sa.Integer(), nullable=False),
+        sa.ForeignKeyConstraint(
+            ['category_id'],
+            ['category.id'],
+        ),
+        sa.PrimaryKeyConstraint('id'),
     )
 
 

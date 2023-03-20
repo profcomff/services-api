@@ -23,11 +23,15 @@ def upgrade():
     conn = op.get_bind()
     res = conn.execute(sa.text("select id from button")).fetchall()
     for i in range(0, len(res)):
-        conn.execute(sa.text(f"""UPDATE "button"
+        conn.execute(
+            sa.text(
+                f"""UPDATE "button"
                                  SET "order"={i + 1}, 
                                      "link"='#', 
                                      "type"='external' 
-                                 WHERE id={res[i][0]}"""))
+                                 WHERE id={res[i][0]}"""
+            )
+        )
     op.alter_column('button', 'order', nullable=False)
     op.alter_column('button', 'link', nullable=False)
     op.alter_column('button', 'type', nullable=False)
@@ -37,9 +41,13 @@ def upgrade():
     op.add_column('category', sa.Column('order', sa.Integer(), nullable=True))
     res = conn.execute(sa.text("select id from category")).fetchall()
     for i in range(0, len(res)):
-        conn.execute(sa.text(f"""UPDATE "category"
+        conn.execute(
+            sa.text(
+                f"""UPDATE "category"
                                      SET "order"={i + 1} 
-                                     WHERE id={res[i][0]}"""))
+                                     WHERE id={res[i][0]}"""
+            )
+        )
     op.alter_column('category', 'order', nullable=False)
     op.alter_column('category', 'name', existing_type=sa.VARCHAR(), nullable=False)
     op.alter_column('category', 'type', existing_type=sa.VARCHAR(), nullable=False)

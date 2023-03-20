@@ -35,4 +35,3 @@ app.add_middleware(
 app.include_router(button, prefix='/category/{category_id}/button', tags=["Button"])
 app.include_router(category, prefix='/category', tags=["Category"])
 app.include_router(scope, prefix='/scope', tags=["Scope"])
-
