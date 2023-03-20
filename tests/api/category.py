@@ -2,6 +2,7 @@ import json
 from starlette import status
 from services_backend.settings import get_settings
 from services_backend.models.database import Category
+from pytest_mock import MockerFixture
 
 
 class TestCategory:
@@ -34,7 +35,26 @@ class TestCategory:
         assert not db_category_created.buttons
         client.delete(f'{self._url}{db_category_created.id}')
 
-    def test_get_by_id_success(self, client, db_category):
+    def test_get_by_id_success(self, client, db_category, mocker: MockerFixture):
+        res = client.get(f'{self._url}{db_category.id}')
+        assert res.status_code == status.HTTP_200_OK
+        res_body = res.json()
+        assert res_body['id'] == db_category.id
+        assert res_body['type'] == db_category.type
+        assert res_body['name'] == db_category.name
+        assert res_body['order'] == db_category.order
+
+        user_mock = mocker.patch('auth_lib.fastapi.UnionAuth.__call__')
+        user_mock.return_value = {
+            "session_scopes": [{"id": 0, "name": "string", "comment": "string"},
+                               {"id": 1, "name": "test", "comment": "string"}],
+            "user_scopes": [{"id": 0, "name": "string", "comment": "string"}],
+            "indirect_groups": [{"id": 0, "name": "string", "parent_id": 0}],
+            "groups": [{"id": 0, "name": "string", "parent_id": 0}],
+            "id": 0,
+            "email": "string",
+        }
+
         res = client.get(f'{self._url}{db_category.id}')
         assert res.status_code == status.HTTP_200_OK
         res_body = res.json()
@@ -153,3 +173,52 @@ class TestCategory:
 
         res = client.get(f"{self._url}{res1.json()['id']}")
         assert res.json()['order'] == 1
+
+    def test_category_scopes(self, client, dbsession, mocker: MockerFixture):
+        category_body = {"name": "t", "type": "string"}
+        res1 = client.post(self._url, data=json.dumps(category_body))
+        assert res1.status_code == status.HTTP_200_OK
+        res1_body = res1.json()
+
+        scope_body = {"name": "test"}
+        res2 = client.post(f"{self._url}{res1_body['id']}/scope/", data=json.dumps(scope_body))
+        assert res2.status_code == status.HTTP_200_OK
+
+        res = client.get(f"{self._url}{res1_body['id']}")
+        assert res.status_code == status.HTTP_404_NOT_FOUND
+
+        user_mock = mocker.patch('auth_lib.fastapi.UnionAuth.__call__')
+        user_mock.return_value = {
+            "session_scopes": [{"id": 0, "name": "string", "comment": "string"}, {"id": 1, "name": "test", "comment": "string"}],
+            "user_scopes": [{"id": 0, "name": "string", "comment": "string"}],
+            "indirect_groups": [{"id": 0, "name": "string", "parent_id": 0}],
+            "groups": [{"id": 0, "name": "string", "parent_id": 0}],
+            "id": 0,
+            "email": "string",
+        }
+
+        res = client.get(f"{self._url}{res1_body['id']}")
+        assert res.status_code == status.HTTP_200_OK
+
+    def test_category_invalid_scopes(self, client, dbsession, mocker: MockerFixture):
+        category_body = {"name": "t", "type": "string"}
+        res1 = client.post(self._url, data=json.dumps(category_body))
+        assert res1.status_code == status.HTTP_200_OK
+        res1_body = res1.json()
+
+        scope_body = {"name": "test"}
+        res2 = client.post(f"{self._url}{res1_body['id']}/scope/", data=json.dumps(scope_body))
+        assert res2.status_code == status.HTTP_200_OK
+
+        user_mock = mocker.patch('auth_lib.fastapi.UnionAuth.__call__')
+        user_mock.return_value = {
+            "session_scopes": [{"id": 0, "name": "string", "comment": "string"}, {"id": 3, "name": "lmao", "comment": "string"}],
+            "user_scopes": [{"id": 0, "name": "string", "comment": "string"}],
+            "indirect_groups": [{"id": 0, "name": "string", "parent_id": 0}],
+            "groups": [{"id": 0, "name": "string", "parent_id": 0}],
+            "id": 0,
+            "email": "string",
+        }
+
+        res = client.get(f"{self._url}{res1_body['id']}")
+        assert res.status_code == status.HTTP_404_NOT_FOUND
