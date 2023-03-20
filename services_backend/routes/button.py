@@ -33,7 +33,7 @@ def create_button(
     if last_button:
         button.order = last_button.order + 1
     db.session.add(button)
-    db.session.commit()
+    db.session.flush()
     return button
 
 
@@ -98,7 +98,7 @@ def remove_button(
         raise HTTPException(status_code=404, detail="Button is not in this category")
     db.session.delete(button)
     db.session.query(Button).filter(Button.order > button.order).update({"order": Button.order - 1})
-    db.session.commit()
+    db.session.flush()
 
 
 @button.patch("/{button_id}", response_model=ButtonUpdate)
@@ -143,5 +143,5 @@ def update_button(
             db.session.query(Button).filter(Button.order > button.order).update({"order": Button.order - 1})
 
     query.update(button_inp.dict(exclude_unset=True, exclude_none=True))
-    db.session.commit()
+    db.session.flush()
     return button

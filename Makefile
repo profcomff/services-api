@@ -8,12 +8,12 @@ venv:
 	python3.11 -m venv venv
 
 format:
-	autoflake -r --in-place --remove-all-unused-imports ./services_backend
-	isort ./services_backend
-	black ./services_backend
+	source ./venv/bin/activate && autoflake -r --in-place --remove-all-unused-imports ./services_backend
+	source ./venv/bin/activate && isort ./services_backend
+	source ./venv/bin/activate && black ./services_backend
 
 db:
 	docker run -d -p 5432:5432 -e POSTGRES_HOST_AUTH_METHOD=trust --name db-services-backend postgres:15
 
 migrate:
-	alembic upgrade head
+	source ./venv/bin/activate && alembic upgrade head

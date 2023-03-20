@@ -12,7 +12,7 @@ scope = APIRouter()
 def create_scope(scope_inp: ScopeCreate, category_id: int, user=Depends(UnionAuth(['services.scope.create']))):
     scope = Scope(**{"name": scope_inp.name, "category_id": category_id})
     db.session.add(scope)
-    db.session.commit()
+    db.session.flush()
     return scope
 
 
@@ -27,4 +27,4 @@ def delete_scope(category_id: int, scope_id: int, user=Depends(UnionAuth(['servi
     if not scope:
         raise HTTPException(status_code=404, detail="Scope does not exist")
     db.session.delete(scope)
-    db.session.commit()
+    db.session.flush()

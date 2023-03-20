@@ -11,7 +11,7 @@ def db_category(dbsession):
     yield category
     for button in dbsession.query(Button).filter(Button.category_id == category.id).all():
         dbsession.delete(button)
-        dbsession.commit()
+        dbsession.flush()
     dbsession.delete(category)
     dbsession.commit()
 
@@ -25,4 +25,4 @@ def db_button(dbsession, db_category):
     yield _button
     if _button:
         dbsession.delete(_button)
-        dbsession.commit()
+    dbsession.commit()
