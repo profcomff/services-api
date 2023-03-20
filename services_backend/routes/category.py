@@ -48,22 +48,15 @@ def get_categories(
         logger.info(f"User {user_id} triggered get_categories")
 
     user_scopes = [scope["name"] for scope in user["session_scopes"]] if user else []
-    categories = db.session.query(Category).all()
-    category_scopes = []
-    for categ in categories:
-        category_scopes.append([scope.__dict__["name"] for scope in categ.scopes])
+    filtered_categories = []
+    for category in db.session.query(Category).order_by(Category.order).all():
+        category_scopes = [scope.__dict__["name"] for scope in category.scopes]
+        if (category_scopes == []) or (set(user_scopes) & set(category_scopes)):
+            filtered_categories.append(category)
 
     return [
         CategoryGet.from_orm(row).dict(exclude={"buttons"} if 'buttons' not in info else {})
-        for row in list(
-            filter(
-                None,
-                [
-                    categ if (set(user_scopes).intersection(category_scopes) or (categ.scopes == None)) else None
-                    for categ in categories
-                ],
-            )
-        )
+        for row in filtered_categories
     ]
 
 
@@ -83,30 +76,17 @@ def get_category(
         logger.info(f"User {user_id} triggered get_category")
 
     user_scopes = [scope["name"] for scope in user["session_scopes"]] if user else []
-
-    categories = list(
-        filter(
-            None,
-            [
-                categ
-                if (
-                    set(user_scopes).intersection([scope.__dict__["name"] for scope in categ.scopes])
-                    or (categ.scopes == None)
-                )
-                else None
-                for categ in db.session.query(Category).all()
-            ],
-        )
-    )
-    category = list(filter(None, [category if category.id == category_id else None for category in categories]))
-    if not category:
+    category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
+    if not category or (
+        category.scopes and not (set(user_scopes) & set([scope.__dict__["name"] for scope in category.scopes]))
+    ):
         raise HTTPException(status_code=404, detail="Category does not exist")
     return {
         "id": category_id,
-        "order": category[0].order,
-        "name": category[0].name,
-        "type": category[0].type,
-        "scopes": category[0].scopes,
+        "order": category.order,
+        "name": category.name,
+        "type": category.type,
+        "scopes": category.scopes,
     }
 
 

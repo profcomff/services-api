@@ -32,6 +32,7 @@ class TestCategory:
         assert db_category_created.type == body["type"]
         assert db_category_created.order == 1
         assert not db_category_created.buttons
+        client.delete(f'{self._url}{db_category_created.id}')
 
     def test_get_by_id_success(self, client, db_category):
         res = client.get(f'{self._url}{db_category.id}')
