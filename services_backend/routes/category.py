@@ -28,7 +28,7 @@ def create_category(
     if last_category:
         category.order = last_category.order + 1
     db.session.add(category)
-    db.session.commit()
+    db.session.flush()
     return category
 
 
@@ -109,7 +109,7 @@ def remove_category(
         db.session.flush()
     db.session.query(Category).filter(Category.order > category.order).update({"order": Category.order - 1})
     db.session.delete(category)
-    db.session.commit()
+    db.session.flush()
 
 
 @category.patch("/{category_id}", response_model=CategoryUpdate)
@@ -148,5 +148,5 @@ def update_category(
 
     query = db.session.query(Category).filter(Category.id == category_id)
     query.update(category_inp.dict(exclude_unset=True, exclude_none=True))
-    db.session.commit()
+    db.session.flush()
     return category
