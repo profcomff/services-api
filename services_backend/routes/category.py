@@ -4,10 +4,10 @@ from typing import Literal
 from auth_lib.fastapi import UnionAuth
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_sqlalchemy import db
+from sqlalchemy.orm import joinedload
 
-from ..models.database import Button, Category
+from ..models.database import Button, Category, Scope
 from .models.category import CategoryCreate, CategoryGet, CategoryUpdate
-
 
 logger = logging.getLogger(__name__)
 category = APIRouter()
@@ -28,7 +28,7 @@ def create_category(
     if last_category:
         category.order = last_category.order + 1
     db.session.add(category)
-    db.session.commit()
+    db.session.flush()
     return category
 
 
@@ -42,10 +42,21 @@ def get_categories(
     Необходимые scopes: `-`
     """
     user_id = user.get('id') if user is not None else None
-    logger.info(f"User {user_id} triggered get_categories")
+    if user_id is None:
+        logger.info("Unauthorised user triggered get_categories")
+    else:
+        logger.info(f"User {user_id} triggered get_categories")
+
+    user_scopes = set([scope["name"] for scope in user["session_scopes"]] if user else [])
+    filtered_categories = []
+    for category in db.session.query(Category).order_by(Category.order).options(joinedload(Category.scopes)).all():
+        category_scopes = set([scope.__dict__["name"] for scope in category.scopes])
+        if (category_scopes == set()) or (user_scopes & category_scopes):
+            filtered_categories.append(category)
+
     return [
         CategoryGet.from_orm(row).dict(exclude={"buttons"} if 'buttons' not in info else {})
-        for row in db.session.query(Category).order_by(Category.order).all()
+        for row in filtered_categories
     ]
 
 
@@ -59,15 +70,23 @@ def get_category(
     Необходимые scopes: `-`
     """
     user_id = user.get('id') if user is not None else None
-    logger.info(f"User {user_id} triggered get_category")
+    if user_id is None:
+        logger.info("Unauthorised user triggered get_category")
+    else:
+        logger.info(f"User {user_id} triggered get_category")
+
+    user_scopes = set([scope["name"] for scope in user["session_scopes"]] if user else [])
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
-    if not category:
+    if not category or (
+        category.scopes and not (user_scopes & set([scope.__dict__["name"] for scope in category.scopes]))
+    ):
         raise HTTPException(status_code=404, detail="Category does not exist")
     return {
         "id": category_id,
         "order": category.order,
         "name": category.name,
         "type": category.type,
+        "scopes": category.scopes,
     }
 
 
@@ -90,7 +109,7 @@ def remove_category(
         db.session.flush()
     db.session.query(Category).filter(Category.order > category.order).update({"order": Category.order - 1})
     db.session.delete(category)
-    db.session.commit()
+    db.session.flush()
 
 
 @category.patch("/{category_id}", response_model=CategoryUpdate)
@@ -129,5 +148,5 @@ def update_category(
 
     query = db.session.query(Category).filter(Category.id == category_id)
     query.update(category_inp.dict(exclude_unset=True, exclude_none=True))
-    db.session.commit()
+    db.session.flush()
     return category
