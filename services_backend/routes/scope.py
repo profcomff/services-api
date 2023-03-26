@@ -9,7 +9,9 @@ scope = APIRouter()
 
 
 @scope.post("/", response_model=ScopeGet)
-def create_scope(scope_inp: ScopeCreate, category_id: int, user=Depends(UnionAuth(['services.category.permission.create']))):
+def create_scope(
+    scope_inp: ScopeCreate, category_id: int, user=Depends(UnionAuth(['services.category.permission.create']))
+):
     scope = Scope(**{"name": scope_inp.name, "category_id": category_id})
     db.session.add(scope)
     db.session.flush()
