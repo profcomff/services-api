@@ -1,7 +1,9 @@
 import json
+
 from starlette import status
-from services_backend.settings import get_settings
+
 from services_backend.models.database import Button
+from services_backend.settings import get_settings
 
 
 class TestButton:

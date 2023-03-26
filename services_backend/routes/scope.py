@@ -1,9 +1,10 @@
-from fastapi import HTTPException, APIRouter, Depends
+from auth_lib.fastapi import UnionAuth
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi_sqlalchemy import db
 
-from auth_lib.fastapi import UnionAuth
-from .models.scope import ScopeGet, ScopeCreate
 from ..models.database import Scope
+from .models.scope import ScopeCreate, ScopeGet
+
 
 scope = APIRouter()
 

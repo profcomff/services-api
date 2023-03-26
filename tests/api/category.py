@@ -1,8 +1,10 @@
 import json
-from starlette import status
-from services_backend.settings import get_settings
-from services_backend.models.database import Category
+
 from pytest_mock import MockerFixture
+from starlette import status
+
+from services_backend.models.database import Category
+from services_backend.settings import get_settings
 
 
 class TestCategory:
