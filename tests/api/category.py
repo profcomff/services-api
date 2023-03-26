@@ -1,8 +1,10 @@
 import json
-from starlette import status
-from services_backend.settings import get_settings
-from services_backend.models.database import Category
+
 from pytest_mock import MockerFixture
+from starlette import status
+
+from services_backend.models.database import Category
+from services_backend.settings import get_settings
 
 
 class TestCategory:
@@ -46,8 +48,10 @@ class TestCategory:
 
         user_mock = mocker.patch('auth_lib.fastapi.UnionAuth.__call__')
         user_mock.return_value = {
-            "session_scopes": [{"id": 0, "name": "string", "comment": "string"},
-                               {"id": 1, "name": "test", "comment": "string"}],
+            "session_scopes": [
+                {"id": 0, "name": "string", "comment": "string"},
+                {"id": 1, "name": "test", "comment": "string"},
+            ],
             "user_scopes": [{"id": 0, "name": "string", "comment": "string"}],
             "indirect_groups": [{"id": 0, "name": "string", "parent_id": 0}],
             "groups": [{"id": 0, "name": "string", "parent_id": 0}],
@@ -189,7 +193,10 @@ class TestCategory:
 
         user_mock = mocker.patch('auth_lib.fastapi.UnionAuth.__call__')
         user_mock.return_value = {
-            "session_scopes": [{"id": 0, "name": "string", "comment": "string"}, {"id": 1, "name": "test", "comment": "string"}],
+            "session_scopes": [
+                {"id": 0, "name": "string", "comment": "string"},
+                {"id": 1, "name": "test", "comment": "string"},
+            ],
             "user_scopes": [{"id": 0, "name": "string", "comment": "string"}],
             "indirect_groups": [{"id": 0, "name": "string", "parent_id": 0}],
             "groups": [{"id": 0, "name": "string", "parent_id": 0}],
@@ -212,7 +219,10 @@ class TestCategory:
 
         user_mock = mocker.patch('auth_lib.fastapi.UnionAuth.__call__')
         user_mock.return_value = {
-            "session_scopes": [{"id": 0, "name": "string", "comment": "string"}, {"id": 3, "name": "lmao", "comment": "string"}],
+            "session_scopes": [
+                {"id": 0, "name": "string", "comment": "string"},
+                {"id": 3, "name": "lmao", "comment": "string"},
+            ],
             "user_scopes": [{"id": 0, "name": "string", "comment": "string"}],
             "indirect_groups": [{"id": 0, "name": "string", "parent_id": 0}],
             "groups": [{"id": 0, "name": "string", "parent_id": 0}],

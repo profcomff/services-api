@@ -1,15 +1,18 @@
-from fastapi import HTTPException, APIRouter, Depends
+from auth_lib.fastapi import UnionAuth
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi_sqlalchemy import db
 
-from auth_lib.fastapi import UnionAuth
-from .models.scope import ScopeGet, ScopeCreate
 from ..models.database import Scope
+from .models.scope import ScopeCreate, ScopeGet
+
 
 scope = APIRouter()
 
 
 @scope.post("/", response_model=ScopeGet)
-def create_scope(scope_inp: ScopeCreate, category_id: int, user=Depends(UnionAuth(['services.category.permission.create']))):
+def create_scope(
+    scope_inp: ScopeCreate, category_id: int, user=Depends(UnionAuth(['services.category.permission.create']))
+):
     scope = Scope(**{"name": scope_inp.name, "category_id": category_id})
     db.session.add(scope)
     db.session.flush()

@@ -9,6 +9,7 @@ from sqlalchemy.orm import joinedload
 from ..models.database import Button, Category, Scope
 from .models.category import CategoryCreate, CategoryGet, CategoryUpdate
 
+
 logger = logging.getLogger(__name__)
 category = APIRouter()
 
