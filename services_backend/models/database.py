@@ -11,7 +11,9 @@ class Category(Base):
     order: Mapped[int] = mapped_column(Integer, default=1)
     name: Mapped[str] = mapped_column(String)
     type: Mapped[str] = mapped_column(String)
-    buttons: Mapped[list[Button]] = relationship("Button", back_populates="category", foreign_keys="Button.category_id", order_by='Button.order')
+    buttons: Mapped[list[Button]] = relationship(
+        "Button", back_populates="category", foreign_keys="Button.category_id", order_by='Button.order'
+    )
     scopes: Mapped[list[Scope]] = relationship("Scope", back_populates="category")
 
 
