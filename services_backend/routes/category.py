@@ -1,14 +1,15 @@
 import logging
+from operator import itemgetter
 from typing import Literal
 
 from auth_lib.fastapi import UnionAuth
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_sqlalchemy import db
 from sqlalchemy.orm import joinedload
-from operator import itemgetter
 
 from ..models.database import Button, Category
 from .models.category import CategoryCreate, CategoryGet, CategoryUpdate
+
 
 logger = logging.getLogger(__name__)
 category = APIRouter()
