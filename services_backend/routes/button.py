@@ -27,9 +27,12 @@ def create_button(
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
-    last_button = db.session.query(Button).order_by(Button.order.desc()).first()
+    last_button = db.session.query(Button).filter(Button.category_id == category_id).order_by(Button.order.desc()).first()
     button = Button(**button_inp.dict(exclude_none=True))
     button.category_id = category_id
+    for key in button_inp:
+        if not key[1]:
+            raise HTTPException(status_code=422, detail="Wrong schema")
     if last_button:
         button.order = last_button.order + 1
     db.session.add(button)
@@ -81,7 +84,7 @@ def get_button(
 def remove_button(
     button_id: int,
     category_id: int,
-    user=Depends(UnionAuth(['services.button.remove'])),
+    user=Depends(UnionAuth(['services.button.delete'])),
 ):
     """Удалить кнопку
 
