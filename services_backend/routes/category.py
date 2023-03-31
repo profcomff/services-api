@@ -1,5 +1,4 @@
 import logging
-from operator import itemgetter
 from typing import Literal
 
 from auth_lib.fastapi import UnionAuth
