@@ -4,8 +4,8 @@ from .scope import ScopeGet
 
 
 class CategoryCreate(Base):
-    type: str | None
-    name: str | None
+    type: str
+    name: str
 
 
 class CategoryUpdate(Base):

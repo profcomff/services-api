@@ -2,10 +2,10 @@ from .base import Base
 
 
 class ButtonCreate(Base):
-    icon: str | None
-    name: str | None
-    link: str | None
-    type: str | None
+    icon: str
+    name: str
+    link: str
+    type: str
 
 
 class ButtonUpdate(Base):
