@@ -32,9 +32,6 @@ def create_button(
     )
     button = Button(**button_inp.dict(exclude_none=True))
     button.category_id = category_id
-    for key in button_inp:
-        if not key[1]:
-            raise HTTPException(status_code=422, detail="Wrong schema")
     if last_button:
         button.order = last_button.order + 1
     db.session.add(button)
