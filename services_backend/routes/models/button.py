@@ -1,5 +1,6 @@
-from .base import Base
 from pydantic import Field
+
+from .base import Base
 
 
 class ButtonCreate(Base):

@@ -1,7 +1,8 @@
+from pydantic import Field
+
 from .base import Base
 from .button import ButtonGet
 from .scope import ScopeGet
-from pydantic import Field
 
 
 class CategoryCreate(Base):
