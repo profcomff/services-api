@@ -13,7 +13,7 @@
 ## Разработка
 Backend разработка – https://github.com/profcomff/.github/wiki/%5Bdev%5D-Backend-разработка
 
-CONTRIBUTING.md - нету 
+CONTRIBUTING.md - https://github.com/profcomff/services-api/blob/f22b360ba1ab5ab8e876c26a1cee563c32d36c6b/CONTRIBUTING.md (потом поменяю)
 
 ## Quick Start
 
