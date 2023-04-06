@@ -1,11 +1,12 @@
 from .base import Base
+from pydantic import Field
 
 
 class ButtonCreate(Base):
-    icon: str
-    name: str
-    link: str
-    type: str
+    icon: str = Field(description='Иконка кнопки')
+    name: str = Field(description='Название кнопки')
+    link: str = Field(description='Ссылка, на которую перенаправляет кнопка')
+    type: str = Field(description='Тип открываемой ссылки')
 
 
 class ButtonUpdate(Base):
