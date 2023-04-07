@@ -19,7 +19,7 @@ class TestButton:
             "icon": "https://lh3.googleusercontent.com/yURn6ISxDySTdXZAW2PUcADMnU3y9YX0M1RyXOH8a3sa1Tr0pHhPLGw5BKuiLiXa3Eh0fyHm7Dfsd9FodK3fxJge6g=w640-h400-e365-rj-sc0x00ffffff",
             "name": "string",
             "link": "google.com",
-            "type": "test",
+            "type": "inapp",
         }
         res = client.post(f"/category/{db_category.id}/button/", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
@@ -57,7 +57,7 @@ class TestButton:
         assert get_res.status_code == status.HTTP_404_NOT_FOUND
 
     def test_patch_by_id_success(self, db_button, client, db_category):
-        body = {"icon": "cool icon", "name": "nice name", "order": 2, "link": "ya.ru", "type": "nice type"}
+        body = {"icon": "cool icon", "name": "nice name", "order": 2, "link": "ya.ru", "type": "inapp"}
         res = client.patch(f"/category/{db_category.id}/button/{db_button.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
         res_body = res.json()
@@ -99,7 +99,7 @@ class TestButton:
             "icon": "test",
             "name": "test",
             "link": "test",
-            "type": "test",
+            "type": "inapp",
         }
 
         res = client.post(f"/category/{db_category.id}/button/", data=json.dumps(body))
@@ -115,7 +115,7 @@ class TestButton:
             "icon": "test",
             "name": "new",
             "link": "test",
-            "type": "test",
+            "type": "inapp",
         }
         res1 = client.post(f"/category/{db_category.id}/button/", data=json.dumps(body))
         assert res1.status_code == status.HTTP_200_OK
@@ -132,7 +132,7 @@ class TestButton:
             "icon": "test",
             "name": "new",
             "link": "test",
-            "type": "test",
+            "type": "inapp",
         }
         res = client.post(f"/category/{db_category.id}/button/", data=json.dumps(body))
         res1 = client.patch(f"/category/{db_category.id}/button/{res.json()['id']}", data=json.dumps({"order": -10}))
@@ -143,7 +143,7 @@ class TestButton:
             "icon": "test",
             "name": "new",
             "link": "test",
-            "type": "test",
+            "type": "inapp",
         }
         res1 = client.post(f"/category/{db_category.id}/button/", data=json.dumps(body))
         assert res1.status_code == status.HTTP_200_OK
