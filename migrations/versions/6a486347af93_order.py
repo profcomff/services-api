@@ -21,20 +21,19 @@ def upgrade():
     op.add_column('button', sa.Column('link', sa.String(), nullable=True))
     op.add_column('button', sa.Column('type', sa.String(), nullable=True))
     conn = op.get_bind()
-    res = conn.execute(sa.text("select id from button")).fetchall()
-    for i in range(0, len(res)):
-        conn.execute(
-            sa.text(
-                f"""UPDATE "button"
-                                 SELECT * FROM categories
-                                 
-                                 SET "order"={i + 1}, 
-                                     "link"='#', 
-                                     "type"='external' 
-                                 WHERE id={res[i][0]}
-                                 WHERE category_id = category.id"""
+    res_c = conn.execute(sa.text("select * from category")).fetchall()
+    for category in res_c:
+        res_b = conn.execute(sa.text(f"select id from button where button.id = {category[0]}")).fetchall()
+        for i in range(0, len(res_b)):
+            conn.execute(
+                sa.text(
+                    f"""UPDATE "button"
+                                     SET "order"={i + 1}, 
+                                         "link"='#', 
+                                         "type"='external' 
+                                     WHERE id={res_b[i][0]}"""
+                )
             )
-        )
     op.alter_column('button', 'order', nullable=False)
     op.alter_column('button', 'link', nullable=False)
     op.alter_column('button', 'type', nullable=False)
@@ -42,13 +41,13 @@ def upgrade():
     op.alter_column('button', 'category_id', existing_type=sa.INTEGER(), nullable=False)
     op.alter_column('button', 'icon', existing_type=sa.VARCHAR(), nullable=False)
     op.add_column('category', sa.Column('order', sa.Integer(), nullable=True))
-    res = conn.execute(sa.text("select id from category")).fetchall()
-    for i in range(0, len(res)):
+    res_c = conn.execute(sa.text("select id from category")).fetchall()
+    for i in range(0, len(res_c)):
         conn.execute(
             sa.text(
                 f"""UPDATE "category"
                                      SET "order"={i + 1} 
-                                     WHERE id={res[i][0]}"""
+                                     WHERE id={res_c[i][0]}"""
             )
         )
     op.alter_column('category', 'order', nullable=False)
