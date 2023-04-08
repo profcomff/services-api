@@ -1,7 +1,7 @@
 from pydantic import Field
 
-from .base import Base
 from ...models.database import Type
+from .base import Base
 
 
 class ButtonCreate(Base):

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from enum import Enum
+
 from sqlalchemy import Enum as DbEnum
 from sqlalchemy import ForeignKey, Integer, String
-from sqlalchemy.orm import Mapped, relationship, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 
