@@ -21,19 +21,17 @@ def upgrade():
     op.add_column('button', sa.Column('link', sa.String(), nullable=True))
     op.add_column('button', sa.Column('type', sa.String(), nullable=True))
     conn = op.get_bind()
-    res_c = conn.execute(sa.text("select * from category")).fetchall()
-    for category in res_c:
-        res_b = conn.execute(sa.text(f"select id from button where button.id = {category[0]}")).fetchall()
-        for i in range(0, len(res_b)):
-            conn.execute(
-                sa.text(
-                    f"""UPDATE "button"
-                                     SET "order"={i + 1}, 
-                                         "link"='#', 
-                                         "type"='external' 
-                                     WHERE id={res_b[i][0]}"""
-                )
+    res = conn.execute(sa.text("select * from button")).fetchall()
+    for i in range(0, len(res)):
+        conn.execute(
+            sa.text(
+                f"""UPDATE "button"
+                                 SET "order"={i + 1}, 
+                                     "link"=f'{res[i][5]}', 
+                                     "type"='inapp'
+                                 WHERE id={res[i][0]}"""
             )
+        )
     op.alter_column('button', 'order', nullable=False)
     op.alter_column('button', 'link', nullable=False)
     op.alter_column('button', 'type', nullable=False)
