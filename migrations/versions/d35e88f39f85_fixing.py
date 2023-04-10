@@ -20,12 +20,10 @@ depends_on = None
 
 def upgrade():
     conn = op.get_bind()
-    res_c = conn.execute(sa.text("select * from category")).fetchall()
+    res_c = conn.execute(sa.text("select * from category ORDER BY category.order")).fetchall()
     for category in res_c:
         res_b = sorted(
-            conn.execute(sa.text(f"select * from button WHERE category_id={category[0]}")).fetchall(),
-            key=operator.itemgetter(2),
-        )
+            conn.execute(sa.text(f"select * from button WHERE category_id={category[0]} ORDER BY button.order")).fetchall())
         for i in range(0, len(res_b)):
             conn.execute(
                 sa.text(
@@ -41,12 +39,10 @@ def upgrade():
 def downgrade():
     k = 0
     conn = op.get_bind()
-    res_c = conn.execute(sa.text("select * from category")).fetchall()
+    res_c = conn.execute(sa.text("select * from category ORDER BY category.order")).fetchall()
     for category in res_c:
         res_b = sorted(
-            conn.execute(sa.text(f"select * from button WHERE category_id={category[0]}")).fetchall(),
-            key=operator.itemgetter(2),
-        )
+            conn.execute(sa.text(f"select * from button WHERE category_id={category[0]} ORDER BY button.order")).fetchall())
         for i in range(0, len(res_b)):
             conn.execute(
                 sa.text(
