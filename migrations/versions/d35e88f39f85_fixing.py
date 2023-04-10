@@ -30,7 +30,7 @@ def upgrade():
                 sa.text(
                     f"""UPDATE "button"
                                         SET "order"={i + 1}, 
-                                            "link"='{res_b[i][5].replace('~:text=%', '~:text=%')}', 
+                                            "link"='{res_b[i][5]}', 
                                             "type"='{res_b[i][6]}' 
                                         WHERE id={res_b[i][0]}"""
                 )
