@@ -27,7 +27,7 @@ def upgrade():
             sa.text(
                 f"""UPDATE "button"
                                  SET "order"={i + 1}, 
-                                     "link"=f'{res[i][5]}', 
+                                     "link"=#', 
                                      "type"='inapp'
                                  WHERE id={res[i][0]}"""
             )
