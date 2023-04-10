@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_sqlalchemy import db
 from sqlalchemy.orm import joinedload
 
-from ..models.database import Button, Category, Scope
+from ..models.database import Button, Category
 from .models.category import CategoryCreate, CategoryGet, CategoryUpdate
 
 

@@ -1,11 +1,13 @@
+from pydantic import Field
+
 from .base import Base
 from .button import ButtonGet
 from .scope import ScopeGet
 
 
 class CategoryCreate(Base):
-    type: str | None
-    name: str | None
+    type: str = Field(description='Тип отображения категории')
+    name: str = Field(description='Имя категории')
 
 
 class CategoryUpdate(Base):

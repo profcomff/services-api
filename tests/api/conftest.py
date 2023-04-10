@@ -19,7 +19,7 @@ def db_category(dbsession):
 
 @pytest.fixture
 def db_button(dbsession, db_category):
-    _button = Button(name='button', category_id=db_category.id, icon='test', link='g', type='d')
+    _button = Button(name='button', category_id=db_category.id, icon='test', link='g', type='inapp')
     dbsession.add(_button)
     dbsession.commit()
     _button = dbsession.query(Button).filter(Button.id == _button.id).one_or_none()
