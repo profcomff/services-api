@@ -9,8 +9,8 @@ from services_backend.settings import get_settings
 class TestButton:
     settings = get_settings()
 
-    def test_get_success(self, client, db_button, db_category):
-        res = client.get(f"/category/{db_category.id}/button/{db_button.id}")
+    async def test_get_success(self, client, db_button, db_category):
+        res = await client.get(f"/category/{db_category.id}/button/{db_button.id}")
         assert res.status_code == status.HTTP_200_OK
         assert res.json()['id'] == db_button.id
 
@@ -153,3 +153,13 @@ class TestButton:
 
         res = client.get(f"/category/{db_category.id}/button/{db_button.id}")
         assert res.json()['order'] == 1
+
+    def test_type_not_enum(self, client, dbsession, db_category):
+        body = {
+            "icon": "test",
+            "name": "new",
+            "link": "test",
+            "type": "lmao",
+        }
+        res = client.post(f"/category/{db_category.id}/button/", data=json.dumps(body))
+        assert res.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
