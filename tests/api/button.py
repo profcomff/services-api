@@ -9,8 +9,8 @@ from services_backend.settings import get_settings
 class TestButton:
     settings = get_settings()
 
-    async def test_get_success(self, client, db_button, db_category):
-        res = await client.get(f"/category/{db_category.id}/button/{db_button.id}")
+    def test_get_success(self, client, db_button, db_category):
+        res = client.get(f"/category/{db_category.id}/button/{db_button.id}")
         assert res.status_code == status.HTTP_200_OK
         assert res.json()['id'] == db_button.id
 
