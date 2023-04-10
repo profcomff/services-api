@@ -153,3 +153,13 @@ class TestButton:
 
         res = client.get(f"/category/{db_category.id}/button/{db_button.id}")
         assert res.json()['order'] == 1
+
+    def test_type_not_enum(self, client, dbsession, db_category):
+        body = {
+            "icon": "test",
+            "name": "new",
+            "link": "test",
+            "type": "lmao",
+        }
+        res = client.post(f"/category/{db_category.id}/button/", data=json.dumps(body))
+        assert res.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

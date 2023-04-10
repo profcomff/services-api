@@ -17,7 +17,7 @@ class ButtonUpdate(Base):
     name: str | None = Field(description='Название кнопки')
     order: int | None = Field(description='Порядок, в котором отображаются кнопки')
     link: str | None = Field(description='Ссылка, на которую перенаправляет кнопка')
-    type: str | None = Field(description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер')
+    type: Type | None = Field(description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер')
 
 
 class ButtonGet(Base):
@@ -26,4 +26,4 @@ class ButtonGet(Base):
     icon: str | None = Field(description='Иконка кнопки')
     name: str | None = Field(description='Название кнопки')
     link: str | None = Field(description='Ссылка, на которую перенаправляет кнопка')
-    type: str | None = Field(description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер')
+    type: Type | None = Field(description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер')
