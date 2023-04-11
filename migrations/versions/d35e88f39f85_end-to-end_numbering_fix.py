@@ -1,4 +1,4 @@
-"""Fixing
+"""End-to-end numbering fix
 
 Revision ID: d35e88f39f85
 Revises: 660bb7891726

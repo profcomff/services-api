@@ -13,7 +13,7 @@
 ## Разработка
 Backend разработка – https://github.com/profcomff/.github/wiki/%5Bdev%5D-Backend-разработка
 
-CONTRIBUTING.md - [CONTRIBUTING.md](services-api/CONTRIBUTING.md)
+CONTRIBUTING.md - [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Quick Start
 
@@ -64,5 +64,5 @@ foo@bar:~$ python -m services-backend
 
 Backend разработка – https://github.com/profcomff/.github/wiki/%5Bdev%5D-Backend-разработка
 
-CONTRIBUTING.md - [CONTRIBUTING.md](services-api/CONTRIBUTING.md)
+CONTRIBUTING.md - [CONTRIBUTING.md](CONTRIBUTING.md)
 
