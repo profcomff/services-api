@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from ...models.database import Type
+from services_backend.models.database import Type
 from .base import Base
 
 
