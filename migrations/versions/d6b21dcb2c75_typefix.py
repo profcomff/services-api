@@ -8,8 +8,6 @@ Create Date: 2023-04-11 14:21:54.007129
 import sqlalchemy as sa
 from alembic import op
 
-from services_backend.models.database import Type
-
 
 # revision identifiers, used by Alembic.
 revision = 'd6b21dcb2c75'
