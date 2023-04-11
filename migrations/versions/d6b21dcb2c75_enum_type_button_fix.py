@@ -1,4 +1,4 @@
-"""typefix
+"""enum type button fix
 
 Revision ID: d6b21dcb2c75
 Revises: d35e88f39f85
