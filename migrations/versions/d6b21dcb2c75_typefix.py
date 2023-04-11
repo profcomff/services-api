@@ -5,8 +5,9 @@ Revises: d35e88f39f85
 Create Date: 2023-04-11 14:21:54.007129
 
 """
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
+
 from services_backend.models.database import Type
 
 
