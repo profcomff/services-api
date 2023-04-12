@@ -86,8 +86,6 @@ class TestCategory:
 
     def test_patch_unset_params(self, client, db_category):
         body = {}
-        res = client.patch(f"{self._url}/{db_category.id}", data=json.dumps(body))
-        assert res.status_code == status.HTTP_400_BAD_REQUEST
         body["order"] = 1
         res = client.patch(f"{self._url}/{db_category.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK

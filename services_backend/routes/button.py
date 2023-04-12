@@ -36,6 +36,7 @@ class ButtonGet(Base):
     icon: str | None = Field(description='Иконка кнопки')
     name: str | None = Field(description='Название кнопки')
     link: str | None = Field(description='Ссылка, на которую перенаправляет кнопка')
+    order: int | None = Field(description='Порядок, в котором отображаются кнопки')
     type: Type | None = Field(description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер')
 
 
