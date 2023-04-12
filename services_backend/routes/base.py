@@ -7,7 +7,9 @@ from services_backend.settings import get_settings
 
 from .button import button
 from .category import category
-from .scope import scope
+
+
+# from .scope import scope
 
 
 settings = get_settings()
@@ -38,4 +40,3 @@ app.add_middleware(
 
 app.include_router(button, prefix='/category/{category_id}/button', tags=["Button"])
 app.include_router(category, prefix='/category', tags=["Category"])
-app.include_router(scope, prefix='/category/{category_id}/scope', tags=["Scope"])
