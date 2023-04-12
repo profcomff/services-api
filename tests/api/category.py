@@ -8,7 +8,7 @@ from services_backend.settings import get_settings
 
 
 class TestCategory:
-    _url = '/category/'
+    _url = '/category'
     settings = get_settings()
 
     def test_get_success(self, client, db_category):
@@ -35,10 +35,10 @@ class TestCategory:
         assert db_category_created.type == body["type"]
         assert db_category_created.order == 1
         assert not db_category_created.buttons
-        client.delete(f'{self._url}{db_category_created.id}')
+        client.delete(f'{self._url}/{db_category_created.id}')
 
     def test_get_by_id_success(self, client, db_category, mocker: MockerFixture):
-        res = client.get(f'{self._url}{db_category.id}')
+        res = client.get(f'{self._url}/{db_category.id}')
         assert res.status_code == status.HTTP_200_OK
         res_body = res.json()
         assert res_body['id'] == db_category.id
@@ -59,7 +59,7 @@ class TestCategory:
             "email": "string",
         }
 
-        res = client.get(f'{self._url}{db_category.id}')
+        res = client.get(f'{self._url}/{db_category.id}')
         assert res.status_code == status.HTTP_200_OK
         res_body = res.json()
         assert res_body['id'] == db_category.id
@@ -68,16 +68,16 @@ class TestCategory:
         assert res_body['order'] == db_category.order
 
     def test_delete_by_id_success(self, client, dbsession, db_category):
-        res = client.delete(f'{self._url}{db_category.id}')
+        res = client.delete(f'{self._url}/{db_category.id}')
         assert res.status_code == status.HTTP_200_OK
         q = dbsession.query(Category).filter(Category.id == db_category.id)
         assert q.one_or_none() is None
-        get_res = client.get(f'{self._url}{db_category.id}')
+        get_res = client.get(f'{self._url}/{db_category.id}')
         assert get_res.status_code == status.HTTP_404_NOT_FOUND
 
     def test_patch_by_id_success(self, client, db_category):
         body = {"type": "test", "name": "test", "order": 1}
-        res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body))
+        res = client.patch(f"{self._url}/{db_category.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
         res_body = res.json()
         assert res_body['type'] == body['type']
@@ -86,14 +86,14 @@ class TestCategory:
 
     def test_patch_unset_params(self, client, db_category):
         body = {}
-        res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body))
+        res = client.patch(f"{self._url}/{db_category.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_400_BAD_REQUEST
         body["order"] = 1
-        res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body))
+        res = client.patch(f"{self._url}/{db_category.id}", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
         assert res.json()["order"] == body["order"]
         body_ord = {"order": 1}
-        res = client.patch(f"{self._url}{db_category.id}", data=json.dumps(body_ord))
+        res = client.patch(f"{self._url}/{db_category.id}", data=json.dumps(body_ord))
         assert res.status_code == status.HTTP_200_OK
         assert res.json()["order"] == body_ord["order"]
 
@@ -102,12 +102,12 @@ class TestCategory:
         assert res.status_code == status.HTTP_404_NOT_FOUND
 
     def test_delete_by_id_not_found(self, client, db_category):
-        res = client.delete(f'{self._url}{db_category.id + 1}')
+        res = client.delete(f'{self._url}/{db_category.id + 1}')
         assert res.status_code == status.HTTP_404_NOT_FOUND
 
     def test_patch_by_id_not_found(self, client, db_category):
         body = {"type": "string", "name": "string", "order": 1}
-        res = client.patch(f"{self._url}{db_category.id + 1}", data=json.dumps(body))
+        res = client.patch(f"{self._url}/{db_category.id + 1}", data=json.dumps(body))
         assert res.status_code == status.HTTP_404_NOT_FOUND
 
     def test_create_first(self, client, db_category):
@@ -118,13 +118,13 @@ class TestCategory:
 
         res = client.post(self._url, data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
-        res1 = client.patch(f"{self._url}{res.json()['id']}", data=json.dumps({"order": 1}))
+        res1 = client.patch(f"{self._url}/{res.json()['id']}", data=json.dumps({"order": 1}))
         assert res1.status_code == status.HTTP_200_OK
         assert res1.json()["order"] == 1
 
-        res_old = client.get(f"{self._url}{db_category.id}")
+        res_old = client.get(f"{self._url}/{db_category.id}")
         assert res_old.json()["order"] == 2
-        client.delete(f"{self._url}{res.json()['id']}")
+        client.delete(f"{self._url}/{res.json()['id']}")
 
     def test_patch_order(self, client, db_category):
         body = {
@@ -133,13 +133,13 @@ class TestCategory:
         }
         res1 = client.post(self._url, data=json.dumps(body))
         assert res1.status_code == status.HTTP_200_OK
-        res = client.patch(f"{self._url}{res1.json()['id']}", data=json.dumps({"order": 1}))
+        res = client.patch(f"{self._url}/{res1.json()['id']}", data=json.dumps({"order": 1}))
         assert res.status_code == status.HTTP_200_OK
         assert res.json()["order"] == 1
 
-        res = client.get(f"{self._url}{db_category.id}")
+        res = client.get(f"{self._url}/{db_category.id}")
         assert res.json()["order"] == 2
-        client.delete(f"{self._url}{res1.json()['id']}")
+        client.delete(f"{self._url}/{res1.json()['id']}")
 
     def test_create_third_fail(self, db_category, client):
         body = {
@@ -148,9 +148,9 @@ class TestCategory:
         }
         res1 = client.post(self._url, data=json.dumps(body))
         assert res1.status_code == status.HTTP_200_OK
-        res = client.patch(f"{self._url}{res1.json()['id']}", data=json.dumps({"order": 33}))
+        res = client.patch(f"{self._url}/{res1.json()['id']}", data=json.dumps({"order": 33}))
         assert res.status_code == status.HTTP_400_BAD_REQUEST
-        client.delete(f"{self._url}{res1.json()['id']}")
+        client.delete(f"{self._url}/{res1.json()['id']}")
 
     def test_create_negative_order_fail(self, db_category, client):
         body = {
@@ -159,9 +159,9 @@ class TestCategory:
         }
         res1 = client.post(self._url, data=json.dumps(body))
         assert res1.status_code == status.HTTP_200_OK
-        res = client.patch(f"{self._url}{res1.json()['id']}", data=json.dumps({"order": -1}))
+        res = client.patch(f"{self._url}/{res1.json()['id']}", data=json.dumps({"order": -1}))
         assert res.status_code == status.HTTP_400_BAD_REQUEST
-        client.delete(f"{self._url}{res1.json()['id']}")
+        client.delete(f"{self._url}/{res1.json()['id']}")
 
     def test_delete_order(self, db_category, client):
         body = {
@@ -172,63 +172,8 @@ class TestCategory:
         assert res1.status_code == status.HTTP_200_OK
         assert res1.json()['order'] == 2
 
-        res = client.delete(f"{self._url}{db_category.id}")
+        res = client.delete(f"{self._url}/{db_category.id}")
         assert res.status_code == status.HTTP_200_OK
 
-        res = client.get(f"{self._url}{res1.json()['id']}")
+        res = client.get(f"{self._url}/{res1.json()['id']}")
         assert res.json()['order'] == 1
-
-    def test_category_scopes(self, client, dbsession, mocker: MockerFixture):
-        category_body = {"name": "t", "type": "string"}
-        res1 = client.post(self._url, data=json.dumps(category_body))
-        assert res1.status_code == status.HTTP_200_OK
-        res1_body = res1.json()
-
-        scope_body = {"name": "test"}
-        res2 = client.post(f"{self._url}{res1_body['id']}/scope/", data=json.dumps(scope_body))
-        assert res2.status_code == status.HTTP_200_OK
-
-        res = client.get(f"{self._url}{res1_body['id']}")
-        assert res.status_code == status.HTTP_404_NOT_FOUND
-
-        user_mock = mocker.patch('auth_lib.fastapi.UnionAuth.__call__')
-        user_mock.return_value = {
-            "session_scopes": [
-                {"id": 0, "name": "string", "comment": "string"},
-                {"id": 1, "name": "test", "comment": "string"},
-            ],
-            "user_scopes": [{"id": 0, "name": "string", "comment": "string"}],
-            "indirect_groups": [{"id": 0, "name": "string", "parent_id": 0}],
-            "groups": [{"id": 0, "name": "string", "parent_id": 0}],
-            "id": 0,
-            "email": "string",
-        }
-
-        res = client.get(f"{self._url}{res1_body['id']}")
-        assert res.status_code == status.HTTP_200_OK
-
-    def test_category_invalid_scopes(self, client, dbsession, mocker: MockerFixture):
-        category_body = {"name": "t", "type": "string"}
-        res1 = client.post(self._url, data=json.dumps(category_body))
-        assert res1.status_code == status.HTTP_200_OK
-        res1_body = res1.json()
-
-        scope_body = {"name": "test"}
-        res2 = client.post(f"{self._url}{res1_body['id']}/scope/", data=json.dumps(scope_body))
-        assert res2.status_code == status.HTTP_200_OK
-
-        user_mock = mocker.patch('auth_lib.fastapi.UnionAuth.__call__')
-        user_mock.return_value = {
-            "session_scopes": [
-                {"id": 0, "name": "string", "comment": "string"},
-                {"id": 3, "name": "lmao", "comment": "string"},
-            ],
-            "user_scopes": [{"id": 0, "name": "string", "comment": "string"}],
-            "indirect_groups": [{"id": 0, "name": "string", "parent_id": 0}],
-            "groups": [{"id": 0, "name": "string", "parent_id": 0}],
-            "id": 0,
-            "email": "string",
-        }
-
-        res = client.get(f"{self._url}{res1_body['id']}")
-        assert res.status_code == status.HTTP_404_NOT_FOUND

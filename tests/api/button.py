@@ -21,7 +21,7 @@ class TestButton:
             "link": "google.com",
             "type": "inapp",
         }
-        res = client.post(f"/category/{db_category.id}/button/", data=json.dumps(body))
+        res = client.post(f"/category/{db_category.id}/button", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
         res_body = res.json()
         assert res_body["icon"] == body["icon"]
@@ -102,7 +102,7 @@ class TestButton:
             "type": "inapp",
         }
 
-        res = client.post(f"/category/{db_category.id}/button/", data=json.dumps(body))
+        res = client.post(f"/category/{db_category.id}/button", data=json.dumps(body))
         assert res.status_code == status.HTTP_200_OK
 
         res = client.patch(f"/category/{db_category.id}/button/{res.json()['id']}", data=json.dumps({"order": 1}))
@@ -117,7 +117,7 @@ class TestButton:
             "link": "test",
             "type": "inapp",
         }
-        res1 = client.post(f"/category/{db_category.id}/button/", data=json.dumps(body))
+        res1 = client.post(f"/category/{db_category.id}/button", data=json.dumps(body))
         assert res1.status_code == status.HTTP_200_OK
 
         body_patch = {
@@ -134,7 +134,7 @@ class TestButton:
             "link": "test",
             "type": "inapp",
         }
-        res = client.post(f"/category/{db_category.id}/button/", data=json.dumps(body))
+        res = client.post(f"/category/{db_category.id}/button", data=json.dumps(body))
         res1 = client.patch(f"/category/{db_category.id}/button/{res.json()['id']}", data=json.dumps({"order": -10}))
         assert res1.status_code == status.HTTP_400_BAD_REQUEST
 
@@ -145,7 +145,7 @@ class TestButton:
             "link": "test",
             "type": "inapp",
         }
-        res1 = client.post(f"/category/{db_category.id}/button/", data=json.dumps(body))
+        res1 = client.post(f"/category/{db_category.id}/button", data=json.dumps(body))
         assert res1.status_code == status.HTTP_200_OK
 
         res = client.delete(f"/category/{db_category.id}/button/{res1.json()['id']}")
@@ -161,5 +161,5 @@ class TestButton:
             "link": "test",
             "type": "lmao",
         }
-        res = client.post(f"/category/{db_category.id}/button/", data=json.dumps(body))
+        res = client.post(f"/category/{db_category.id}/button", data=json.dumps(body))
         assert res.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
