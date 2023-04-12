@@ -4,17 +4,55 @@ from typing import Literal
 from auth_lib.fastapi import UnionAuth
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_sqlalchemy import db
-from sqlalchemy.orm import joinedload
+from pydantic import Field
 
-from ..models.database import Button, Category
-from .models.category import CategoryCreate, CategoryGet, CategoryUpdate
+from services_backend.models.database import Button, Category, Type
+from services_backend.schemas import Base
 
 
 logger = logging.getLogger(__name__)
 category = APIRouter()
 
 
-@category.post("/", response_model=CategoryGet)
+# region schemas
+
+
+class ButtonGet(Base):
+    id: int = Field(description='Айди кнопки')
+    icon: str | None = Field(description='Иконка кнопки')
+    name: str | None = Field(description='Название кнопки')
+    link: str | None = Field(description='Ссылка, на которую перенаправляет кнопка')
+    type: Type | None = Field(description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер')
+
+
+class CategoryCreate(Base):
+    type: str = Field(description='Тип отображения категории')
+    name: str = Field(description='Имя категории')
+    scopes: set[str] | None = Field(description='Каким пользователям будет видна категория')
+
+
+class CategoryUpdate(Base):
+    order: int | None = Field(description='На какую позицию перенести категорию')
+    type: str | None = Field(description='Тип отображения категории')
+    name: str | None = Field(description='Имя категории')
+    scopes: set[str] | None = Field(description='Каким пользователям будет видна категория')
+
+
+class CategoryGet(Base):
+    id: int
+    order: int
+    type: str | None
+    name: str | None
+    buttons: list[ButtonGet] | None
+    scopes: list[str] | None
+
+
+# endregion
+
+# region routes
+
+
+@category.post("", response_model=CategoryGet)
 def create_category(
     category_inp: CategoryCreate,
     user=Depends(UnionAuth(['services.category.create'])),
@@ -33,7 +71,7 @@ def create_category(
     return category
 
 
-@category.get("/", response_model=list[CategoryGet], response_model_exclude_none=True)
+@category.get("", response_model=list[CategoryGet], response_model_exclude_none=True)
 def get_categories(
     info: list[Literal['buttons']] = Query([]),
     user=Depends(UnionAuth(allow_none=True, auto_error=False)),
@@ -50,8 +88,8 @@ def get_categories(
 
     user_scopes = set([scope["name"] for scope in user["session_scopes"]] if user else [])
     filtered_categories = []
-    for category in db.session.query(Category).order_by(Category.order).options(joinedload(Category.scopes)).all():
-        category_scopes = set([scope.__dict__["name"] for scope in category.scopes])
+    for category in db.session.query(Category).order_by(Category.order).all():
+        category_scopes = set(category.scopes)
         if (category_scopes == set()) or (user_scopes & category_scopes):
             filtered_categories.append(category)
 
@@ -78,9 +116,7 @@ def get_category(
 
     user_scopes = set([scope["name"] for scope in user["session_scopes"]] if user else [])
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
-    if not category or (
-        category.scopes and not (user_scopes & set([scope.__dict__["name"] for scope in category.scopes]))
-    ):
+    if not category or (category.scopes and not (user_scopes & category.scopes)):
         raise HTTPException(status_code=404, detail="Category does not exist")
     return {
         "id": category_id,
@@ -123,14 +159,17 @@ def update_category(
 
     Необходимые scopes: `services.category.update`
     """
+
     logger.info(f"User {user.get('id')} triggered update_category")
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
     last_category = db.session.query(Category).order_by(Category.order.desc()).first()
 
     if not category:
         raise HTTPException(status_code=404, detail="Category does not exist")
-    if not any(category_inp.dict().values()):
-        raise HTTPException(status_code=400, detail="Empty schema")
+
+    if category_inp.scopes is not None:
+        category.scopes = category_inp.scopes
+        db.session.flush()
 
     if category_inp.order:
         if category_inp.order < 1:
@@ -148,6 +187,11 @@ def update_category(
             db.session.query(Category).filter(Category.order > category.order).update({"order": Category.order - 1})
 
     query = db.session.query(Category).filter(Category.id == category_id)
-    query.update(category_inp.dict(exclude_unset=True, exclude_none=True))
-    db.session.flush()
+    update_values = category_inp.dict(exclude_unset=True, exclude_none=True, exclude={'scopes': True})
+    if update_values:
+        query.update(**update_values)
+    db.session.commit()
     return category
+
+
+# endregion

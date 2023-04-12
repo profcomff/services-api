@@ -3,17 +3,50 @@ import logging
 from auth_lib.fastapi import UnionAuth
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_sqlalchemy import db
+from pydantic import Field
 
-from ..models.database import Button, Category
-from .models.button import ButtonCreate, ButtonGet, ButtonUpdate
-from .models.category import CategoryGet
+from services_backend.models.database import Button, Category, Type
+from services_backend.schemas import Base
 
 
 logger = logging.getLogger(__name__)
 button = APIRouter()
 
+# region schemas
 
-@button.post("/", response_model=ButtonGet)
+
+class ButtonCreate(Base):
+    icon: str = Field(description='Иконка кнопки')
+    name: str = Field(description='Название кнопки')
+    link: str = Field(description='Ссылка, на которую перенаправляет кнопка')
+    type: Type = Field(description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер')
+
+
+class ButtonUpdate(Base):
+    category_id: int | None = Field(description='Айди категории')
+    icon: str | None = Field(description='Иконка кнопки')
+    name: str | None = Field(description='Название кнопки')
+    order: int | None = Field(description='Порядок, в котором отображаются кнопки')
+    link: str | None = Field(description='Ссылка, на которую перенаправляет кнопка')
+    type: Type | None = Field(description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер')
+
+
+class ButtonGet(Base):
+    id: int = Field(description='Айди кнопки')
+    icon: str | None = Field(description='Иконка кнопки')
+    name: str | None = Field(description='Название кнопки')
+    link: str | None = Field(description='Ссылка, на которую перенаправляет кнопка')
+    type: Type | None = Field(description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер')
+
+
+class ButtonsGet(Base):
+    buttons: list[ButtonGet] | None
+
+
+# endregion
+
+
+@button.post("", response_model=ButtonGet)
 def create_button(
     button_inp: ButtonCreate,
     category_id: int,
@@ -39,7 +72,7 @@ def create_button(
     return button
 
 
-@button.get("/", response_model=CategoryGet)
+@button.get("", response_model=ButtonsGet)
 def get_buttons(
     category_id: int,
     user=Depends(UnionAuth(allow_none=True, auto_error=False)),
