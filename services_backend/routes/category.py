@@ -64,11 +64,15 @@ def create_category(
     """
     logger.info(f"User {user.get('id')} triggered create_category")
     last_category = db.session.query(Category).order_by(Category.order.desc()).first()
+    scopes = category_inp.scopes
+    category_inp.scopes = None
     category = Category(**category_inp.dict(exclude_none=True))
+    if scopes is not None:
+        category.scopes = scopes
     if last_category:
         category.order = last_category.order + 1
     db.session.add(category)
-    db.session.flush()
+    db.session.commit()
     return category
 
 
@@ -91,7 +95,7 @@ def get_categories(
     filtered_categories = []
     for category in db.session.query(Category).order_by(Category.order).all():
         category_scopes = set(category.scopes)
-        if (category_scopes == set()) or (user_scopes & category_scopes):
+        if (category_scopes == set()) or len(category_scopes - user_scopes) != 0:
             filtered_categories.append(category)
 
     return [
@@ -117,7 +121,7 @@ def get_category(
 
     user_scopes = set([scope["name"] for scope in user["session_scopes"]] if user else [])
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
-    if not category or (category.scopes and len(category.scopes - user_scopes) == 0):
+    if not category or (category.scopes and len(category.scopes - user_scopes) != 0):
         raise HTTPException(status_code=404, detail="Category does not exist")
     return {
         "id": category_id,
