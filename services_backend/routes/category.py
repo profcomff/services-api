@@ -116,7 +116,7 @@ def get_category(
 
     user_scopes = set([scope["name"] for scope in user["session_scopes"]] if user else [])
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
-    if not category or (category.scopes and not (user_scopes & category.scopes)):
+    if not category or (category.scopes and len(category.scopes - user_scopes) == 0):
         raise HTTPException(status_code=404, detail="Category does not exist")
     return {
         "id": category_id,

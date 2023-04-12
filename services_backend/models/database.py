@@ -3,11 +3,11 @@ from __future__ import annotations
 import logging
 from enum import Enum
 
+from fastapi_sqlalchemy import db
 from sqlalchemy import Enum as DbEnum
 from sqlalchemy import ForeignKey, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.hybrid import hybrid_property
-from fastapi_sqlalchemy import db
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 
@@ -41,7 +41,7 @@ class Category(Base):
                 db.session.delete(s)
 
         # Добавляем недостающие скоупы
-        for s in (new_scopes - old_scopes):
+        for s in new_scopes - old_scopes:
             new_scope = Scope(category=self, name=s)
             db.session.add(new_scope)
             self._scopes.append(new_scope)
