@@ -95,7 +95,7 @@ def get_categories(
     filtered_categories = []
     for category in db.session.query(Category).order_by(Category.order).all():
         category_scopes = set(category.scopes)
-        if (category_scopes == set()) or len(category_scopes - user_scopes) != 0:
+        if (category_scopes == set()) or len(category_scopes - user_scopes) == 0:
             filtered_categories.append(category)
 
     return [
