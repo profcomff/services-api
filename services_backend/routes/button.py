@@ -41,7 +41,7 @@ class ButtonGet(Base):
 
 
 class ButtonsGet(Base):
-    buttons: list[ButtonGet] | None
+    buttons: list[ButtonGet] | None = None
 
 
 # endregion

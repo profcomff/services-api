@@ -42,10 +42,10 @@ class CategoryUpdate(Base):
 class CategoryGet(Base):
     id: int
     order: int
-    type: str | None
-    name: str | None
-    buttons: list[ButtonGet] | None
-    scopes: list[str] | None
+    type: str | None = None
+    name: str | None = None
+    buttons: list[ButtonGet] | None = None
+    scopes: list[str] | None = None
 
 
 # endregion
