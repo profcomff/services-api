@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     CORS_ALLOW_CREDENTIALS: bool = True
     CORS_ALLOW_METHODS: list[str] = ['*']
     CORS_ALLOW_HEADERS: list[str] = ['*']
-    model_config = ConfigDict(case_sensitive=True, env_file=".env")
+    model_config = ConfigDict(case_sensitive=True, env_file=".env", extra="allow")
 
 
 @lru_cache
