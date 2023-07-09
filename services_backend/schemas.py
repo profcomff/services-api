@@ -8,4 +8,4 @@ class Base(BaseModel):
             attrs.append(f"{k}={v}")
         return "{}({})".format(self.__class__.__name__, ', '.join(attrs))
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, extra="ignore")
