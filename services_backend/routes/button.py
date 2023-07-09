@@ -23,12 +23,12 @@ class ButtonCreate(Base):
 
 
 class ButtonUpdate(Base):
-    category_id: int | None = Field(description='Айди категории')
-    icon: str | None = Field(description='Иконка кнопки')
-    name: str | None = Field(description='Название кнопки')
-    order: int | None = Field(description='Порядок, в котором отображаются кнопки')
-    link: str | None = Field(description='Ссылка, на которую перенаправляет кнопка')
-    type: Type | None = Field(description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер')
+    category_id: int | None = Field(description='Айди категории', default=None)
+    icon: str | None = Field(description='Иконка кнопки', default=None)
+    name: str | None = Field(description='Название кнопки', default=None)
+    order: int | None = Field(description='Порядок, в котором отображаются кнопки', default=None)
+    link: str | None = Field(description='Ссылка, на которую перенаправляет кнопка', default=None)
+    type: Type | None = Field(description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер', default=None)
 
 
 class ButtonGet(Base):
