@@ -28,7 +28,9 @@ class ButtonUpdate(Base):
     name: str | None = Field(description='Название кнопки', default=None)
     order: int | None = Field(description='Порядок, в котором отображаются кнопки', default=None)
     link: str | None = Field(description='Ссылка, на которую перенаправляет кнопка', default=None)
-    type: Type | None = Field(description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер', default=None)
+    type: Type | None = Field(
+        description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер', default=None
+    )
 
 
 class ButtonGet(Base):
