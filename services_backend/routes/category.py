@@ -29,23 +29,23 @@ class ButtonGet(Base):
 class CategoryCreate(Base):
     type: str = Field(description='Тип отображения категории')
     name: str = Field(description='Имя категории')
-    scopes: set[str] | None = Field(description='Каким пользователям будет видна категория')
+    scopes: set[str] | None = Field(description='Каким пользователям будет видна категория', default=None)
 
 
 class CategoryUpdate(Base):
-    order: int | None = Field(description='На какую позицию перенести категорию')
-    type: str | None = Field(description='Тип отображения категории')
-    name: str | None = Field(description='Имя категории')
-    scopes: set[str] | None = Field(description='Каким пользователям будет видна категория')
+    order: int | None = Field(description='На какую позицию перенести категорию', default=None)
+    type: str | None = Field(description='Тип отображения категории', default=None)
+    name: str | None = Field(description='Имя категории', default=None)
+    scopes: set[str] | None = Field(description='Каким пользователям будет видна категория', default=None)
 
 
 class CategoryGet(Base):
     id: int
     order: int
-    type: str | None
-    name: str | None
-    buttons: list[ButtonGet] | None
-    scopes: list[str] | None
+    type: str | None = None
+    name: str | None = None
+    buttons: list[ButtonGet] | None = None
+    scopes: list[str] | None = None
 
 
 # endregion

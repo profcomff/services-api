@@ -27,7 +27,7 @@ def client(mocker: MockerFixture):
 @pytest.fixture(scope='session')
 def dbsession() -> Session:
     settings = get_settings()
-    engine = create_engine(settings.DB_DSN, execution_options={"isolation_level": "AUTOCOMMIT"})
+    engine = create_engine(str(settings.DB_DSN), execution_options={"isolation_level": "AUTOCOMMIT"})
     TestingSessionLocal = sessionmaker(bind=engine)
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)

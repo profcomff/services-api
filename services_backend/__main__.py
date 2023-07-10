@@ -1,6 +1,6 @@
 import uvicorn
 
-from .routes.base import app
+from services_backend.routes.base import app
 
 
 if __name__ == '__main__':
