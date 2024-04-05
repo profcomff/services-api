@@ -189,7 +189,6 @@ def update_button(
 @service.get("/{button_id}", response_model=ButtonGet)
 def get_service(
     button_id: int,
-    category_id: int,
     user=Depends(UnionAuth(allow_none=True, auto_error=False)),
 ):
     """Показать одну кнопку
@@ -200,12 +199,7 @@ def get_service(
     """
     user_id = user.get('id') if user is not None else None
     logger.info(f"User {user_id} triggered get_button")
-    category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
-    if not category:
-        raise HTTPException(status_code=404, detail="Category does not exist")
     button = db.session.query(Button).filter(Button.id == button_id).one_or_none()
     if not button:
         raise HTTPException(status_code=404, detail="Button does not exist")
-    if button.category_id != category_id:
-        raise HTTPException(status_code=404, detail="Button is not this category")
     return button
