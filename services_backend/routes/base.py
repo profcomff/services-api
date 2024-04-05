@@ -5,7 +5,7 @@ from fastapi_sqlalchemy import DBSessionMiddleware
 from services_backend import __version__
 from services_backend.settings import get_settings
 
-from .button import button
+from .button import button, service
 from .category import category
 
 
@@ -40,3 +40,4 @@ app.add_middleware(
 
 app.include_router(button, prefix='/category/{category_id}/button', tags=["Button"])
 app.include_router(category, prefix='/category', tags=["Category"])
+app.include_router(service, prefix='/service', tags=["Service"])
