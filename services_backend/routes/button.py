@@ -11,6 +11,7 @@ from services_backend.schemas import Base
 
 logger = logging.getLogger(__name__)
 button = APIRouter()
+service = APIRouter()
 
 # region schemas
 
@@ -182,4 +183,23 @@ def update_button(
 
     query.update(button_inp.dict(exclude_unset=True, exclude_none=True))
     db.session.flush()
+    return button
+
+
+@service.get("/{button_id}", response_model=ButtonGet)
+def get_service(
+    button_id: int,
+    user=Depends(UnionAuth(allow_none=True, auto_error=False)),
+):
+    """Показать одну кнопку
+
+    Необходимые scopes: `-`
+
+    TODO: Переделать ручку, сделав сервис независимым от кнопки
+    """
+    user_id = user.get('id') if user is not None else None
+    logger.info(f"User {user_id} triggered get_button")
+    button = db.session.query(Button).filter(Button.id == button_id).one_or_none()
+    if not button:
+        raise HTTPException(status_code=404, detail="Button does not exist")
     return button
