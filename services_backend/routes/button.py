@@ -155,7 +155,11 @@ def update_button(
     query = db.session.query(Button).filter(Category.id == category_id).filter(Button.id == button_id)
     button = query.one_or_none()
     last_button = (
-        db.session.query(Button).filter(Category.id == category_id).filter(Button.category_id == category_id).order_by(Button.order.desc()).first()
+        db.session.query(Button)
+        .filter(Category.id == category_id)
+        .filter(Button.category_id == category_id)
+        .order_by(Button.order.desc())
+        .first()
     )
     category = db.session.query(Category).filter(Category.id == category_id).one_or_none()
 
@@ -177,9 +181,13 @@ def update_button(
         if button_inp.order < 1:
             raise HTTPException(status_code=400, detail="Order can`t be less than 1")
         if button.order > button_inp.order:
-            db.session.query(Button).filter(Category.id == category_id).filter(Button.order < button.order).update({"order": Button.order + 1})
+            db.session.query(Button).filter(Category.id == category_id).filter(Button.order < button.order).update(
+                {"order": Button.order + 1}
+            )
         elif button.order < button_inp.order:
-            db.session.query(Button).filter(Category.id == category_id).filter(Button.order > button.order).update({"order": Button.order - 1})
+            db.session.query(Button).filter(Category.id == category_id).filter(Button.order > button.order).update(
+                {"order": Button.order - 1}
+            )
 
     query.update(button_inp.dict(exclude_unset=True, exclude_none=True))
     db.session.flush()

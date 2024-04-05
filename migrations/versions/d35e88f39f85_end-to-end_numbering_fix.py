@@ -5,6 +5,7 @@ Revises: 660bb7891726
 Create Date: 2023-04-09 11:28:59.326067
 
 """
+
 import operator
 
 import sqlalchemy as sa
