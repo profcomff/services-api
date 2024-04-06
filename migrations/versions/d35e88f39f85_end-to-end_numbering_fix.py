@@ -6,8 +6,6 @@ Create Date: 2023-04-09 11:28:59.326067
 
 """
 
-import operator
-
 import sqlalchemy as sa
 from alembic import op
 
@@ -30,9 +28,9 @@ def upgrade():
             conn.execute(
                 sa.text(
                     f"""UPDATE "button"
-                                        SET "order"={i + 1}, 
-                                            "link"='{res_b[i][5]}', 
-                                            "type"='{res_b[i][6]}' 
+                                        SET "order"={i + 1},
+                                            "link"='{res_b[i][5]}',
+                                            "type"='{res_b[i][6]}'
                                         WHERE id={res_b[i][0]}"""
                 )
             )
@@ -50,9 +48,9 @@ def downgrade():
             conn.execute(
                 sa.text(
                     f"""UPDATE "button"
-                                            SET "order"={k + 1}, 
-                                                "link"='{res_b[i][5]}', 
-                                                "type"='{res_b[i][6]}' 
+                                            SET "order"={k + 1},
+                                                "link"='{res_b[i][5]}',
+                                                "type"='{res_b[i][6]}'
                                             WHERE id={res_b[i][0]}"""
                 )
             )
