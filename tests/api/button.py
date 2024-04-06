@@ -40,6 +40,52 @@ def test_post_success(client, db_category, dbsession):
     assert db_button_created.order == 1
 
 
+def test_post_required_scopes_success(client, db_category, dbsession):
+    body = {
+        "icon": "https://lh3.googleusercontent.com/yURn6ISxDySTdXZAW2PUcADMnU3y9YX0M1RyXOH8a3sa1Tr0pHhPLGw5BKuiLiXa3Eh0fyHm7Dfsd9FodK3fxJge6g=w640-h400-e365-rj-sc0x00ffffff",
+        "name": "string",
+        "link": "google.com",
+        "type": "inapp",
+        "required_scopes": ["string"],
+    }
+    res = client.post(f"/category/{db_category.id}/button", data=json.dumps(body))
+    assert res.status_code == status.HTTP_200_OK
+    res = client.get(f"/category/{db_category.id}/button/{res.json()['id']}")
+    assert res.json()["view"] == "active"
+    assert res.json()["scopes"] == ["string"]
+
+
+def test_post_optional_scopes_success(client, db_category, dbsession):
+    body = {
+        "icon": "https://lh3.googleusercontent.com/yURn6ISxDySTdXZAW2PUcADMnU3y9YX0M1RyXOH8a3sa1Tr0pHhPLGw5BKuiLiXa3Eh0fyHm7Dfsd9FodK3fxJge6g=w640-h400-e365-rj-sc0x00ffffff",
+        "name": "string",
+        "link": "google.com",
+        "type": "inapp",
+        "optional_scopes": ["string"],
+    }
+    res = client.post(f"/category/{db_category.id}/button", data=json.dumps(body))
+    assert res.status_code == status.HTTP_200_OK
+    res = client.get(f"/category/{db_category.id}/button/{res.json()['id']}")
+    assert res.json()["view"] == "active"
+    assert res.json()["scopes"] == ["string"]
+
+
+def test_post_required_optional_scopes_success(client, db_category, dbsession):
+    body = {
+        "icon": "https://lh3.googleusercontent.com/yURn6ISxDySTdXZAW2PUcADMnU3y9YX0M1RyXOH8a3sa1Tr0pHhPLGw5BKuiLiXa3Eh0fyHm7Dfsd9FodK3fxJge6g=w640-h400-e365-rj-sc0x00ffffff",
+        "name": "string",
+        "link": "google.com",
+        "type": "inapp",
+        "required_scopes": ["string"],
+        "optional_scopes": ["string"],
+    }
+    res = client.post(f"/category/{db_category.id}/button", data=json.dumps(body))
+    assert res.status_code == status.HTTP_200_OK
+    res = client.get(f"/category/{db_category.id}/button/{res.json()['id']}")
+    assert res.json()["view"] == "active"
+    assert res.json()["scopes"] == ["string"]
+
+
 def test_get_by_id_success(client, db_button, db_category):
     res = client.get(f"/category/{db_category.id}/button/{db_button.id}")
     assert res.status_code == status.HTTP_200_OK
@@ -61,6 +107,16 @@ def test_delete_by_id_success(client, dbsession, db_button, db_category):
 
 
 def test_patch_by_id_success(db_button, client, db_category):
+    body = {
+        "icon": "https://lh3.googleusercontent.com/yURn6ISxDySTdXZAW2PUcADMnU3y9YX0M1RyXOH8a3sa1Tr0pHhPLGw5BKuiLiXa3Eh0fyHm7Dfsd9FodK3fxJge6g=w640-h400-e365-rj-sc0x00ffffff",
+        "name": "string",
+        "link": "google.com",
+        "type": "inapp",
+    }
+    res = client.post(f"/category/{db_category.id}/button", data=json.dumps(body))
+    second_id = res.json()["id"]
+    assert res.status_code == status.HTTP_200_OK
+    assert res.json()["order"] == 2
     body = {"icon": "cool icon", "name": "nice name", "order": 2, "link": "ya.ru", "type": "inapp"}
     res = client.patch(f"/category/{db_category.id}/button/{db_button.id}", data=json.dumps(body))
     assert res.status_code == status.HTTP_200_OK
@@ -70,6 +126,9 @@ def test_patch_by_id_success(db_button, client, db_category):
     assert res_body["name"] == body["name"]
     assert res_body["link"] == body["link"]
     assert res_body["type"] == body["type"]
+    res = client.get(f"/category/{db_category.id}/button/{second_id}")
+    assert res.json()["order"] == 1
+    client.delete(f"/category/{db_category.id}/button/{second_id}")
 
 
 def test_patch_unset_params(client, db_button, db_category):
@@ -147,7 +206,7 @@ def test_patch_negative_order_fail(db_button, client, db_category):
     }
     res = client.post(f"/category/{db_category.id}/button", data=json.dumps(body))
     res1 = client.patch(f"/category/{db_category.id}/button/{res.json()['id']}", data=json.dumps({"order": -10}))
-    assert res1.status_code == status.HTTP_400_BAD_REQUEST
+    assert res1.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 def test_delete_order(db_button, client, db_category):

@@ -4,10 +4,12 @@ from typing import Literal
 from auth_lib.fastapi import UnionAuth
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_sqlalchemy import db
-from pydantic import Field
+from pydantic import Field, conint
 
 from services_backend.models.database import Button, Category, Type
 from services_backend.schemas import Base
+
+from .button import ButtonGet, ButtonView
 
 
 logger = logging.getLogger(__name__)
@@ -17,15 +19,6 @@ category = APIRouter()
 # region schemas
 
 
-class ButtonGet(Base):
-    id: int = Field(description='Айди кнопки')
-    icon: str | None = Field(description='Иконка кнопки')
-    name: str | None = Field(description='Название кнопки')
-    link: str | None = Field(description='Ссылка, на которую перенаправляет кнопка')
-    order: int | None = Field(description='Порядок, в котором отображаются кнопки')
-    type: Type | None = Field(description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер')
-
-
 class CategoryCreate(Base):
     type: str = Field(description='Тип отображения категории')
     name: str = Field(description='Имя категории')
@@ -33,7 +26,7 @@ class CategoryCreate(Base):
 
 
 class CategoryUpdate(Base):
-    order: int | None = Field(description='На какую позицию перенести категорию', default=None)
+    order: conint(gt=0) | None = Field(description='На какую позицию перенести категорию', default=None)
     type: str | None = Field(description='Тип отображения категории', default=None)
     name: str | None = Field(description='Имя категории', default=None)
     scopes: set[str] | None = Field(description='Каким пользователям будет видна категория', default=None)
@@ -66,7 +59,7 @@ def create_category(
     last_category = db.session.query(Category).order_by(Category.order.desc()).first()
     scopes = category_inp.scopes
     category_inp.scopes = None
-    category = Category(**category_inp.dict(exclude_none=True))
+    category = Category(**category_inp.model_dump(exclude_none=True))
     if scopes is not None:
         category.scopes = scopes
     if last_category:
@@ -90,18 +83,53 @@ def get_categories(
         logger.info("Unauthorised user triggered get_categories")
     else:
         logger.info(f"User {user_id} triggered get_categories")
+    try:
+        user_scopes = {scope["name"] for scope in user["user_scopes"]}
+    except TypeError:
+        user_scopes = frozenset()
 
-    user_scopes = set([scope["name"] for scope in user["session_scopes"]] if user else [])
+    session_scopes = set([scope["name"] for scope in user["session_scopes"]] if user else [])
     filtered_categories = []
     for category in db.session.query(Category).order_by(Category.order).all():
         category_scopes = set(category.scopes)
-        if (category_scopes == set()) or len(category_scopes - user_scopes) == 0:
+        if (category_scopes == set()) or len(category_scopes - session_scopes) == 0:
             filtered_categories.append(category)
-
-    return [
-        CategoryGet.from_orm(row).dict(exclude={"buttons"} if 'buttons' not in info else {})
-        for row in filtered_categories
-    ]
+    if 'buttons' not in info:
+        return [CategoryGet.model_validate(row).model_dump(exclude={"buttons"}) for row in filtered_categories]
+    result = []
+    for row in filtered_categories:
+        category = {
+            "id": row.id,
+            "order": row.order,
+            "type": row.type,
+            "name": row.name,
+            "scopes": row.scopes,
+            "buttons": [],
+        }
+        for button in row.buttons:
+            view = ButtonView.ACTIVE
+            scopes = set()
+            if button.required_scopes - user_scopes:
+                view = ButtonView.BLOCKED
+            else:
+                scopes |= button.required_scopes
+                scopes |= user_scopes & button.optional_scopes
+            category["buttons"].append(
+                {
+                    "id": button.id,
+                    "icon": button.icon,
+                    "name": button.name,
+                    "link": button.link,
+                    "order": button.order,
+                    "type": button.type,
+                    "view": view.value,
+                    "scopes": list(scopes) if scopes else None,
+                    "required_scopes": button.required_scopes,
+                    "optional_scopes": button.optional_scopes,
+                }
+            )
+        result.append(category)
+    return result
 
 
 @category.get("/{category_id}", response_model=CategoryGet, response_model_exclude_none=True)
@@ -176,9 +204,7 @@ def update_category(
         category.scopes = category_inp.scopes
         db.session.flush()
 
-    if category_inp.order:
-        if category_inp.order < 1:
-            raise HTTPException(status_code=400, detail="Order can`t be less than 1")
+    if category_inp.order and category.order != category_inp.order:
         if last_category and (category_inp.order > last_category.order):
             raise HTTPException(
                 status_code=400,
@@ -186,13 +212,11 @@ def update_category(
                 f"Last category is {last_category.order}",
             )
 
-        if category.order > category_inp.order:
-            db.session.query(Category).filter(Category.order < category.order).update({"order": Category.order + 1})
-        elif category.order < category_inp.order:
-            db.session.query(Category).filter(Category.order > category.order).update({"order": Category.order - 1})
+        swapping_category = db.session.query(Category).filter(Category.order == category_inp.order).one()
+        swapping_category.order, category.order = category.order, swapping_category.order
 
     query = db.session.query(Category).filter(Category.id == category_id)
-    update_values = category_inp.dict(exclude_unset=True, exclude_none=True, exclude={'scopes': True})
+    update_values = category_inp.model_dump(exclude_unset=True, exclude_none=True, exclude={'scopes': True})
     if update_values:
         query.update(update_values)
     db.session.commit()
