@@ -169,7 +169,7 @@ def test_create_negative_order_fail(db_category, client):
     res1 = client.post('/category', data=json.dumps(body))
     assert res1.status_code == status.HTTP_200_OK
     res = client.patch(f"/category/{res1.json()['id']}", data=json.dumps({"order": -1}))
-    assert res.status_code == status.HTTP_400_BAD_REQUEST
+    assert res.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     client.delete(f"/category/{res1.json()['id']}")
 
 
