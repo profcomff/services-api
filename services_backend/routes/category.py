@@ -123,7 +123,7 @@ def get_categories(
                     "order": button.order,
                     "type": button.type,
                     "view": view.value,
-                    "scopes": list(scopes) if scopes else None,
+                    "scopes": list(scopes) if view == ButtonView.ACTIVE else None,
                     "required_scopes": button.required_scopes,
                     "optional_scopes": button.optional_scopes,
                 }
