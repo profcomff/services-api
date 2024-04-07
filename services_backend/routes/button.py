@@ -314,4 +314,4 @@ def get_service(
     }
     if scopes:
         result["scopes"] = list(scopes)
-    return scopes
+    return result
