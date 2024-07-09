@@ -140,7 +140,7 @@ def get_buttons(
             if user_scopes.issuperset(button.required_scopes):
                 to_add["link"] = button.link
         result["buttons"].append(to_add)
-        
+
     return result
 
 
