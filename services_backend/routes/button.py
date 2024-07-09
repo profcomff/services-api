@@ -129,7 +129,6 @@ def get_buttons(
             "id": button.id,
             "icon": button.icon,
             "name": button.name,
-            "link": button.link,
             "order": button.order,
             "type": button.type,
             "view": view.value,
@@ -138,7 +137,10 @@ def get_buttons(
         }
         if view == ButtonView.ACTIVE:
             to_add["scopes"] = list(scopes)
+            if user_scopes.issuperset(button.required_scopes):
+                to_add["link"] = button.link
         result["buttons"].append(to_add)
+        
     return result
 
 
@@ -177,7 +179,6 @@ def get_button(
         "id": button.id,
         "icon": button.icon,
         "name": button.name,
-        "link": button.link,
         "order": button.order,
         "type": button.type,
         "view": view.value,
@@ -186,6 +187,8 @@ def get_button(
     }
     if view == ButtonView.ACTIVE:
         result["scopes"] = list(scopes)
+        if user_scopes.issuperset(button.required_scopes):
+            result["link"] = button.link
     return result
 
 
