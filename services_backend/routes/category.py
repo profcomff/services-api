@@ -121,7 +121,7 @@ def get_categories(
                     "name": button.name,
                     "link": (
                         button.link
-                        if user_scopes.issuperset(button.required_scopes) and view == ButtonView.ACTIVE
+                        if view == ButtonView.ACTIVE
                         else None
                     ),
                     "order": button.order,
