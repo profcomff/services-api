@@ -182,8 +182,7 @@ def get_button(
         "type": button.type,
         "link": button.link if user_scopes.issuperset(button.required_scopes) else None,
         "view": view.value,
-        "required_scopes": button. 
-        required_scopes,
+        "required_scopes": button.required_scopes,
         "optional_scopes": button.optional_scopes,
     }
     if view == ButtonView.ACTIVE:
