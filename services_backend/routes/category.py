@@ -119,7 +119,7 @@ def get_categories(
                     "id": button.id,
                     "icon": button.icon,
                     "name": button.name,
-                    "link": button.link,
+                    "link": button.link if user_scopes.issuperset(button.required_scopes) else None,
                     "order": button.order,
                     "type": button.type,
                     "view": view.value,

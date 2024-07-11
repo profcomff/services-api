@@ -131,14 +131,13 @@ def get_buttons(
             "name": button.name,
             "order": button.order,
             "type": button.type,
+            "link": button.link if user_scopes.issuperset(button.required_scopes) else None,
             "view": view.value,
             "required_scopes": button.required_scopes,
             "optional_scopes": button.optional_scopes,
         }
         if view == ButtonView.ACTIVE:
             to_add["scopes"] = list(scopes)
-            if user_scopes.issuperset(button.required_scopes):
-                to_add["link"] = button.link
         result["buttons"].append(to_add)
 
     return result
@@ -181,14 +180,14 @@ def get_button(
         "name": button.name,
         "order": button.order,
         "type": button.type,
+        "link": button.link if user_scopes.issuperset(button.required_scopes) else None,
         "view": view.value,
-        "required_scopes": button.required_scopes,
+        "required_scopes": button. 
+        required_scopes,
         "optional_scopes": button.optional_scopes,
     }
     if view == ButtonView.ACTIVE:
         result["scopes"] = list(scopes)
-        if user_scopes.issuperset(button.required_scopes):
-            result["link"] = button.link
     return result
 
 
@@ -308,7 +307,7 @@ def get_service(
         "id": button.id,
         "icon": button.icon,
         "name": button.name,
-        "link": button.link,
+        "link": button.link if user_scopes.issuperset(button.required_scopes) else None,
         "order": button.order,
         "type": button.type,
         "view": view.value,
