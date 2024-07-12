@@ -129,9 +129,9 @@ def get_buttons(
             "id": button.id,
             "icon": button.icon,
             "name": button.name,
-            "link": button.link,
             "order": button.order,
             "type": button.type,
+            "link": button.link if view == ButtonView.ACTIVE else None,
             "view": view.value,
             "required_scopes": button.required_scopes,
             "optional_scopes": button.optional_scopes,
@@ -139,6 +139,7 @@ def get_buttons(
         if view == ButtonView.ACTIVE:
             to_add["scopes"] = list(scopes)
         result["buttons"].append(to_add)
+
     return result
 
 
@@ -177,9 +178,9 @@ def get_button(
         "id": button.id,
         "icon": button.icon,
         "name": button.name,
-        "link": button.link,
         "order": button.order,
         "type": button.type,
+        "link": button.link if view == ButtonView.ACTIVE else None,
         "view": view.value,
         "required_scopes": button.required_scopes,
         "optional_scopes": button.optional_scopes,
@@ -305,7 +306,7 @@ def get_service(
         "id": button.id,
         "icon": button.icon,
         "name": button.name,
-        "link": button.link,
+        "link": button.link if view == ButtonView.ACTIVE else None,
         "order": button.order,
         "type": button.type,
         "view": view.value,
