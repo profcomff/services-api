@@ -3,6 +3,8 @@
 Бэкэнд сервисов приложения Твой ФФ для профкома ФФ МГУ. Реализует логику работы с кнопками и категориями в приложении.
 Репозиторий был создан для упрощения работы фронтэнд-разработчиков с бэкэндом сервисов, для переноса данных кнопок и категорий из захардкодженного json файла в Postgresql базу данных (cringe) и для разграничения доступа.
 
+[<img src="https://cdn.profcomff.com/easycode/easycode.svg" width="200"></img>](https://easycode.profcomff.com/templates/docker-fastapi/workspace?mode=manual&param.Repository+URL=https://github.com/profcomff/services-api.git&param.Working+directory=services-api)
+
 ## Функционал
 
 - Создание кнопок и категорий для отображения на фронте (в приложении)
@@ -23,7 +25,7 @@ CONTRIBUTING.md - [CONTRIBUTING.md](CONTRIBUTING.md)
 ```console
 foo@bar:~$ python3 -m venv ./venv/
 ```
-3) Установите библиотеки 
+3) Установите библиотеки
 ```console
 foo@bar:~$ pip install -m requirements.txt
 ```
@@ -51,7 +53,7 @@ foo@bar:~$ python -m services-backend
     2. *Опционально* Выбрать отображение кнопок принадлежащих категории по запросу `GET /category?info=buttons`
 
 
-3) Удаление категории кнопок. *Необходимо иметь права services.category.delete* 
+3) Удаление категории кнопок. *Необходимо иметь права services.category.delete*
 
     ВАЖНОЕ УТОЧНЕНИЕ: При удалении категории все кнопки, принадлежащей ей также удаляются.
     1. Удалить категорию кнопок по запросу 'DELETE /category/{category_id}
@@ -65,4 +67,3 @@ foo@bar:~$ python -m services-backend
 Backend разработка – https://github.com/profcomff/.github/wiki/%5Bdev%5D-Backend-разработка
 
 CONTRIBUTING.md - [CONTRIBUTING.md](CONTRIBUTING.md)
-
