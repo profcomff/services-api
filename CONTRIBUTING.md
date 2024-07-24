@@ -2,7 +2,7 @@
 
 Ссылки: 
 
-1) Backend разработка – https://github.com/profcomff/.github/wiki/%5Bdev%5D-Backend-разработка
+1) Backend разработка – https://docs.profcomff.com/tvoy-ff/backend/index.html
 
 
 Для запуска проекта нужно иметь доступ к БД профкома/иметь локальную БД. 
