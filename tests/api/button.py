@@ -275,7 +275,7 @@ def test_get_hidden_by_id_success(client, dbsession, db_button, db_category):
 
 
 def test_patch_to_hide_success(client, db_button, db_category):
-    body = {"is_hidden": "True"}
+    body = {"is_hidden": True}
     res = client.patch(f"/category/{db_category.id}/button/{db_button.id}", data=json.dumps(body))
     assert res.status_code == status.HTTP_200_OK
     res_body = res.json()
