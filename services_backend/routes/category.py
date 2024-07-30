@@ -109,7 +109,9 @@ def get_categories(
         for button in row.buttons:
             view = ButtonView.ACTIVE
             scopes = set()
-            if button.required_scopes - user_scopes:
+            if button.is_hidden:
+                view = ButtonView.HIDDEN
+            elif button.required_scopes - user_scopes:
                 view = ButtonView.BLOCKED
             else:
                 scopes |= button.required_scopes
@@ -119,7 +121,7 @@ def get_categories(
                     "id": button.id,
                     "icon": button.icon,
                     "name": button.name,
-                    "link": (button.link if view == ButtonView.ACTIVE else None),
+                    "link": button.link if view == ButtonView.ACTIVE else None,
                     "order": button.order,
                     "type": button.type,
                     "view": view.value,
