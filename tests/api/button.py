@@ -298,4 +298,3 @@ def test_delete_hidden_success(client, dbsession, db_button, db_category):
     assert res.status_code == status.HTTP_200_OK
     q = dbsession.query(Button).filter(Button.id == db_button.id)
     assert not q.one_or_none()
-
