@@ -98,20 +98,7 @@ def create_button(
         button.optional_scopes = optional_scopes
     db.session.add(button)
     db.session.flush()
-    view = ButtonView.HIDDEN if button.is_hidden else ButtonView.ACTIVE
-    result = {
-        "id": button.id,
-        "icon": button.icon,
-        "name": button.name,
-        "link": button.link if view == ButtonView.ACTIVE else None,
-        "order": button.order,
-        "type": button.type,
-        "view": view.value,
-        "required_scopes": button.required_scopes,
-        "optional_scopes": button.optional_scopes,
-        "scopes": [],
-    }
-    return result
+    return button
 
 
 @button.get("", response_model=ButtonsGet, response_model_exclude_unset=True)
