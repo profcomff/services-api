@@ -22,8 +22,9 @@ class ButtonCreate(Base):
     name: str = Field(description='Название кнопки')
     link: str = Field(description='Ссылка, на которую перенаправляет кнопка')
     type: Type = Field(description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер')
-    required_scopes: set[str] | None = Field(description='Каким скоупы нужны, чтобы кнопка была доступна', default=None)
-    optional_scopes: set[str] | None = Field(description='Каким скоупы желательны', default=None)
+    is_hidden: bool = Field(description='Спрятана ли кнопка от пользователя', default=False)
+    required_scopes: set[str] | None = Field(description='Какие скоупы нужны, чтобы кнопка была доступна', default=None)
+    optional_scopes: set[str] | None = Field(description='Какиеп скоупы желательны', default=None)
 
 
 class ButtonUpdate(Base):
@@ -35,13 +36,15 @@ class ButtonUpdate(Base):
     type: Type | None = Field(
         description='Тип открываемой ссылки (Ссылка приложения/Браузер в приложении/Браузер', default=None
     )
-    required_scopes: set[str] | None = Field(description='Каким скоупы нужны, чтобы кнопка была доступна', default=None)
-    optional_scopes: set[str] | None = Field(description='Каким скоупы желательны', default=None)
+    is_hidden: bool | None = Field(description='Спрятана ли кнопка от пользователя', default=None)
+    required_scopes: set[str] | None = Field(description='Какие скоупы нужны, чтобы кнопка была доступна', default=None)
+    optional_scopes: set[str] | None = Field(description='Какие скоупы желательны', default=None)
 
 
 class ButtonView(Enum):
     ACTIVE = "active"
     BLOCKED = "blocked"
+    HIDDEN = "hidden"
 
 
 class ButtonGet(Base):
@@ -95,7 +98,20 @@ def create_button(
         button.optional_scopes = optional_scopes
     db.session.add(button)
     db.session.flush()
-    return button
+    view = ButtonView.HIDDEN if button.is_hidden else ButtonView.ACTIVE
+    result = {
+        "id": button.id,
+        "icon": button.icon,
+        "name": button.name,
+        "link": button.link if view == ButtonView.ACTIVE else None,
+        "order": button.order,
+        "type": button.type,
+        "view": view.value,
+        "required_scopes": button.required_scopes,
+        "optional_scopes": button.optional_scopes,
+        "scopes": [],
+    }
+    return result
 
 
 @button.get("", response_model=ButtonsGet, response_model_exclude_unset=True)
@@ -120,7 +136,9 @@ def get_buttons(
     for button in category.buttons:
         view = ButtonView.ACTIVE
         scopes = set()
-        if button.required_scopes - user_scopes:
+        if button.is_hidden:
+            view = ButtonView.HIDDEN
+        elif button.required_scopes - user_scopes:
             view = ButtonView.BLOCKED
         else:
             scopes |= button.required_scopes
@@ -169,7 +187,9 @@ def get_button(
         raise HTTPException(status_code=404, detail="Button is not this category")
     view = ButtonView.ACTIVE
     scopes = set()
-    if button.required_scopes - user_scopes:
+    if button.is_hidden:
+        view = ButtonView.HIDDEN
+    elif button.required_scopes - user_scopes:
         view = ButtonView.BLOCKED
     else:
         scopes |= button.required_scopes
@@ -297,7 +317,9 @@ def get_service(
         raise HTTPException(status_code=404, detail="Button does not exist")
     view = ButtonView.ACTIVE
     scopes = set()
-    if button.required_scopes - user_scopes:
+    if button.is_hidden:
+        view = ButtonView.HIDDEN
+    elif button.required_scopes - user_scopes:
         view = ButtonView.BLOCKED
     else:
         scopes |= button.required_scopes

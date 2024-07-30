@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_sqlalchemy import db
 from pydantic import Field, conint
 
-from services_backend.models.database import Button, Category, Type
+from services_backend.models.database import Button, Category
 from services_backend.schemas import Base
 
 from .button import ButtonGet, ButtonView
