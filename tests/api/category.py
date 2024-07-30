@@ -187,9 +187,10 @@ def test_delete_order(db_category, client):
 
     res = client.get(f"/category/{res1.json()['id']}")
     assert res.json()['order'] == 1
+    client.delete(f"/category/{res1.json()['id']}")
 
 
-def test_scopes(client, mocker: MockerFixture):
+def test_scopes(client, dbsession, mocker: MockerFixture):
     user_mock = mocker.patch('auth_lib.fastapi.UnionAuth.__call__')
     user_mock.return_value = {
         "session_scopes": [{"id": 0, "name": "string", "comment": "string"}],
@@ -238,3 +239,20 @@ def test_scopes(client, mocker: MockerFixture):
 
     res8 = client.get(f'/category/{id_}')
     assert res8.status_code == status.HTTP_404_NOT_FOUND
+
+    category = dbsession.query(Category).filter(Category.id == id_).one_or_none()
+    dbsession.delete(category)
+    dbsession.commit()
+
+
+def test_get_hidden_button_success(client, dbsession, db_button):
+    db_button.is_hidden = True
+    dbsession.commit()
+    res = client.get('/category', params={"info": "buttons"})
+    assert res.status_code == status.HTTP_200_OK
+    res_body = res.json()
+    assert len(res_body) == 1
+    assert len(res_body[0]["buttons"]) == 1
+    assert res_body[0]["buttons"][0]["id"] == db_button.id
+    assert res_body[0]["buttons"][0]["view"] == "hidden"
+    assert "link" not in res_body[0]["buttons"][0]

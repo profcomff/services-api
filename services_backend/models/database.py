@@ -63,6 +63,7 @@ class Button(Base):
     icon: Mapped[str] = mapped_column(String)
     link: Mapped[str] = mapped_column(String)
     type: Mapped[Type] = mapped_column(DbEnum(Type, native_enum=False), nullable=False)
+    is_hidden: Mapped[bool] = mapped_column(Boolean, default=False)
 
     _scopes: Mapped[list[Scope]] = relationship("Scope", back_populates="button", lazy='joined', cascade='delete')
 
