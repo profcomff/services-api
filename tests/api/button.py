@@ -238,14 +238,14 @@ def test_type_not_enum(client, dbsession, db_category):
 
 
 def test_post_hidden_success(client, dbsession, db_category):
-    body = {"icon": "qq", "name": "new", "link": "google.com", "type": "inapp", "is_hidden": "True"}
+    body = {"icon": "qq", "name": "new", "link": "google.com", "type": "inapp", "is_hidden": True}
     res = client.post(f"/category/{db_category.id}/button", data=json.dumps(body))
     assert res.status_code == status.HTTP_200_OK
     res_body = res.json()
     assert res_body["icon"] == body["icon"]
     assert res_body["order"] == 1
     assert res_body["name"] == body["name"]
-    assert "link" not in res_body
+    assert res_body["link"] == body["link"]
     assert res_body["type"] == body["type"]
     db_button_created: Button = dbsession.query(Button).filter(Button.id == res_body["id"]).one_or_none()
     assert db_button_created
@@ -255,10 +255,14 @@ def test_post_hidden_success(client, dbsession, db_category):
     assert db_button_created.link == body["link"]
     assert db_button_created.type == body["type"]
     assert db_button_created.order == 1
+    assert db_button_created.is_hidden == True
+    dbsession.delete(db_button_created)
+    dbsession.commit()
 
 
-def test_get_hidden_by_id_success(client, db_button, db_category):
+def test_get_hidden_by_id_success(client, dbsession, db_button, db_category):
     db_button.is_hidden = True
+    dbsession.commit()
     res = client.get(f"/category/{db_category.id}/button/{db_button.id}")
     assert res.status_code == status.HTTP_200_OK
     res_body = res.json()
@@ -267,6 +271,7 @@ def test_get_hidden_by_id_success(client, db_button, db_category):
     assert res_body['order'] == db_button.order
     assert res_body['link'] is None
     assert res_body['type'] == db_button.type
+    assert res_body['view'] == "hidden"
 
 
 def test_patch_to_hide_success(client, db_button, db_category):
@@ -284,3 +289,13 @@ def test_patch_to_hide_success(client, db_button, db_category):
     assert res.status_code == status.HTTP_200_OK
     assert res.json()["link"] is None
     assert res.json()["view"] == "hidden"
+
+
+def test_delete_hidden_success(client, dbsession, db_button, db_category):
+    db_button.is_hidden = True
+    dbsession.commit()
+    res = client.delete(f"/category/{db_category.id}/button/{db_button.id}")
+    assert res.status_code == status.HTTP_200_OK
+    q = dbsession.query(Button).filter(Button.id == db_button.id)
+    assert not q.one_or_none()
+
