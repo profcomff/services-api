@@ -20,15 +20,7 @@ depends_on = None
 def upgrade():
     op.add_column('button', sa.Column('is_hidden', sa.Boolean(), nullable=True))
     conn = op.get_bind()
-    res = conn.execute(sa.text("select * from button")).fetchall()
-    for i in range(0, len(res)):
-        conn.execute(
-            sa.text(
-                f"""UPDATE "button"
-                    SET "is_hidden"='false'
-                    WHERE id={res[i][0]}"""
-            )
-        )
+    conn.execute(sa.text(f"""UPDATE "button" SET "is_hidden"='false'"""))
     op.alter_column('button', 'is_hidden', nullable=False)
 
 
