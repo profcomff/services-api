@@ -291,6 +291,21 @@ def test_patch_to_hide_success(client, db_button, db_category):
     assert res.json()["view"] == "hidden"
 
 
+def test_patch_to_unhide_success(client, db_button, db_category):
+    body = {"is_hidden": True}
+    res = client.patch(f"/category/{db_category.id}/button/{db_button.id}", data=json.dumps(body))
+    assert res.status_code == status.HTTP_200_OK
+    res_body = res.json()
+    assert res_body["is_hidden"] == True
+    body["is_hidden"] = False
+    res = client.patch(f"/category/{db_category.id}/button/{db_button.id}", data=json.dumps(body))
+    assert res.status_code == status.HTTP_200_OK
+    res_body = res.json()
+    assert res_body["name"] == db_button.name
+    assert res_body["is_hidden"] == False
+    assert res_body["link"] == db_button.link
+
+
 def test_delete_hidden_success(client, dbsession, db_button, db_category):
     db_button.is_hidden = True
     dbsession.commit()

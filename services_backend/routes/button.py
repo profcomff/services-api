@@ -244,7 +244,7 @@ def update_button(
         raise HTTPException(status_code=404, detail="Category does not exist")
     if not button:
         raise HTTPException(status_code=404, detail="Button does not exist")
-    if not any(button_inp.model_dump().values()):
+    if all(value is None for value in button_inp.model_dump().values()):
         raise HTTPException(status_code=400, detail="Empty schema")
     if button.category_id != category_id:
         raise HTTPException(status_code=404, detail="Button is not this category")
